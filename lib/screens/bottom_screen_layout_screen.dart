@@ -3,16 +3,16 @@ import 'package:skillswap/screens/bottom_screen/explore_screen.dart';
 import 'package:skillswap/screens/bottom_screen/message_screen.dart';
 import 'package:skillswap/screens/bottom_screen/profile_screen.dart';
 import 'package:skillswap/screens/bottom_screen/proposal_screen.dart';
-import 'package:skillswap/utils/my_colors.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class BottomScreenLayoutScreen extends StatefulWidget {
+  const BottomScreenLayoutScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<BottomScreenLayoutScreen> createState() =>
+      _BottomScreenLayoutScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _BottomScreenLayoutScreenState extends State<BottomScreenLayoutScreen> {
   int _selectedIndex = 0;
   List<Widget> lstBottomScreen = [
     const ExploreScreen(),
@@ -25,17 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("Dashboard")),
       body: lstBottomScreen[_selectedIndex],
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: MyColors.color5,
-        foregroundColor: MyColors.color1,
-        shape: CircleBorder(),
-        onPressed: () {},
-        child: Icon(Icons.add),
-      ),
+      floatingActionButton: FloatingActionButton(onPressed: (){},child: Icon(Icons.add),),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
+
         type: BottomNavigationBarType.fixed,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.explore_rounded),
             label: 'Explore',
@@ -50,9 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
-        backgroundColor: MyColors.color4,
-        selectedItemColor: MyColors.color1,
-        unselectedItemColor: MyColors.color2,
+        backgroundColor: Colors.amber,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
