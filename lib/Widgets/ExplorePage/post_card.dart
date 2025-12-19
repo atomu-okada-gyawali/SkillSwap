@@ -34,11 +34,9 @@ class PostCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 border: Border.all(color: Colors.grey[200]!),
               ),
-              width: double.infinity,
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: 131,
-                height: 141,
+              clipBehavior: Clip.hardEdge,
+              child: AspectRatio(
+                aspectRatio: 131 / 141,
                 child: Image.asset(imagePath, fit: BoxFit.cover),
               ),
             ),
