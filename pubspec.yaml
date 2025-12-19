@@ -67,6 +67,7 @@ flutter:
     - assets/images/onboard2.svg
     - assets/images/onboard1.svg
     - assets/images/onboard3.svg
+    - assets/images/guitar.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
@@ -78,10 +79,20 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: OpenSans Regular
+      fonts:
+        - asset: assets/fonts/OpenSans-Regular.ttf
+    - family: OpenSans Bold
+      fonts:
+        - asset: assets/fonts/OpenSans-Bold.ttf
+    - family: OpenSans Italic
+      fonts:
+        - asset: assets/fonts/OpenSans-Italic.ttf
+    - family: OpenSans Medium
+      fonts:
+        - asset: assets/fonts/OpenSans-Medium.ttf
+
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

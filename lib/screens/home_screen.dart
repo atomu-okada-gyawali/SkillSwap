@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   List<Widget> lstBottomScreen = [
-    const ExploreScreen(),
+    ExploreScreen(),
     const ProposalScreen(),
     const MessageScreen(),
     const ProfileScreen(),
@@ -23,8 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Dashboard")),
-      body: lstBottomScreen[_selectedIndex],
+      body: SafeArea(child: lstBottomScreen[_selectedIndex]),
       floatingActionButton: FloatingActionButton(
         backgroundColor: MyColors.color5,
         foregroundColor: MyColors.color1,
@@ -44,10 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.front_hand_rounded),
             label: 'Proposals',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.document_scanner),
-            label: 'Messages',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         backgroundColor: MyColors.color4,

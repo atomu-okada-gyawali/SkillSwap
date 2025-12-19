@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:skillswap/screens/splash_screen.dart';
+import 'package:skillswap/themes/default_theme_data.dart';
 
 void main() {
-  runApp(const MaterialApp(
-    home: SplashScreen(),
-    debugShowCheckedModeBanner: false,
-  ));
+  runApp(
+    MaterialApp(
+      home: const SplashScreen(),
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme, // <- use your theme here
+    ),
+  );
 }
