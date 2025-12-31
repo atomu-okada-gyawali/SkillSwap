@@ -30,6 +30,7 @@ class PostCard extends StatelessWidget {
               child: Icon(Icons.favorite_outline),
             ),
             Container(
+              //fix this
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.0),
                 border: Border.all(color: Colors.grey[200]!),

@@ -30,31 +30,31 @@ class ExploreScreen extends StatefulWidget {
     PostModel(
       title: "Looking to learn React",
       author: "Aayush",
-      wantsToLearn: ["React", "JavaScript", "Frontend"],
+      wantsToLearn: ["React"],
       imagePath: "assets/images/guitar.jpg",
     ),
     PostModel(
       title: "Want to master Flutter",
       author: "Suman",
-      wantsToLearn: ["Flutter", "Dart", "Mobile Development"],
+      wantsToLearn: ["Flutter"],
       imagePath: "assets/images/guitar.jpg",
     ),
     PostModel(
       title: "Interested in Backend Development",
       author: "Ritika",
-      wantsToLearn: ["Node.js", "Express", "MongoDB"],
+      wantsToLearn: ["Node.js"],
       imagePath: "assets/images/guitar.jpg",
     ),
     PostModel(
       title: "Learning UI/UX Design",
       author: "Nischal",
-      wantsToLearn: ["Figma", "UI Design", "UX Research"],
+      wantsToLearn: ["Figma"],
       imagePath: "assets/images/guitar.jpg",
     ),
     PostModel(
       title: "Getting started with Data Science",
       author: "Prabin",
-      wantsToLearn: ["Python", "Pandas", "Machine Learning"],
+      wantsToLearn: ["Python"],
       imagePath: "assets/images/guitar.jpg",
     ),
   ];
