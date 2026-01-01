@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/screens/splash_screen.dart';
-import 'package:skillswap/themes/default_theme_data.dart';
+import 'package:skillswap/features/splash/presentation/pages/splash_screen.dart';
+import 'package:skillswap/app/themes/default_theme_data.dart';
 
 void main() {
   runApp(
