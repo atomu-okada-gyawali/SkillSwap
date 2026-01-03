@@ -8,7 +8,7 @@ import 'package:skillswap/features/auth/presentation/widgets/purple_button.dart'
 import 'package:skillswap/features/auth/presentation/widgets/social_button.dart';
 import 'package:skillswap/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:skillswap/utils/my_colors.dart';
-
+//This is login form widget
 class LoginForm extends ConsumerStatefulWidget {
   const LoginForm({super.key});
 
