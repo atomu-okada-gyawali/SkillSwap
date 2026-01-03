@@ -3,6 +3,7 @@ import 'package:skillswap/features/auth/presentation/widgets/login_form.dart';
 import 'package:skillswap/features/auth/presentation/widgets/sign_up_form.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
+// This is auth AuthScreen widget
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
