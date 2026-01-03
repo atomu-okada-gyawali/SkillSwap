@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/Widgets/login_form.dart';
+import 'package:skillswap/features/auth/presentation/widgets/login_form.dart';
 import 'package:skillswap/features/auth/presentation/widgets/sign_up_form.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -83,7 +83,14 @@ class _AuthScreenState extends State<AuthScreen> {
                 const SizedBox(height: 40),
                 Image.asset('assets/icons/branding.png', width: 200),
                 const SizedBox(height: 40),
-                Expanded(child: isLoginActive ? LoginForm() : SignUpForm()),
+                Expanded(
+                  child: isLoginActive
+                      ? LoginForm()
+                      : SignUpForm(
+                          onRegistered: () =>
+                              setState(() => isLoginActive = true),
+                        ),
+                ),
               ],
             ),
           ),

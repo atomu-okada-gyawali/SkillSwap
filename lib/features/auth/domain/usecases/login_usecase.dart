@@ -32,8 +32,7 @@ class LoginUsecase implements UsecaseWithParams<AuthEntity, LoginUsecaseParams> 
 
   @override
   Future<Either<Failure, AuthEntity>> call(LoginUsecaseParams params) {
-    final entity =
-        AuthEntity(username: params.username, email: '', password: params.password);
     return _authRepository.login(params.username,params.password);
   }
-} 
+}
+ 

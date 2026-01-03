@@ -20,7 +20,7 @@ class PurpleButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           elevation: 5,
-          shadowColor: MyColors.color4.withOpacity(0.3),
+          shadowColor: MyColors.color4.withAlpha(77),
         ),
         child: Text(
           text,

@@ -13,5 +13,6 @@ class AuthEntity extends Equatable {
     this.password,
   });
 
+  @override
   List<Object?> get props => [authId, email, username, password];
 }

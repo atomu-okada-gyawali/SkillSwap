@@ -7,6 +7,7 @@ class CustomTextFormField extends StatefulWidget {
   final bool obscureText; // added
   final String? initialValue;
   final TextEditingController? controller;
+  final FormFieldValidator<String>? validator;
 
   const CustomTextFormField({
     required this.label,
@@ -14,6 +15,7 @@ class CustomTextFormField extends StatefulWidget {
     this.obscureText = false, // added
     this.initialValue,
     this.controller,
+    this.validator,
     super.key,
   });
 
@@ -57,6 +59,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         TextFormField(
           controller: _controller,
           obscureText: _obscure,
+          validator: widget.validator,
           decoration: InputDecoration(
             hintText: widget.hint,
             hintStyle: const TextStyle(color: Colors.grey),

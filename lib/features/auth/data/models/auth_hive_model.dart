@@ -28,9 +28,9 @@ class AuthHiveModel extends HiveObject {
   factory AuthHiveModel.fromEntity(AuthEntity entity) {
     return AuthHiveModel(
       authId: entity.authId,
-      email: entity.email!,
-      username: entity.username!,
-      password: entity.password!,
+      email: entity.email,
+      username: entity.username,
+      password: entity.password,
     );
   }
   //to entity

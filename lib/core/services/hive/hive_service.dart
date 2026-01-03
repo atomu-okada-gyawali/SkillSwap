@@ -45,6 +45,12 @@ class HiveService {
     return model;
   }
 
+  //isemailexists
+  bool isEmailExists(String email) {
+    final users = _authBox.values.where((user) => user.email == email);
+    return users.isNotEmpty;
+  }
+
   //Login
   Future<AuthHiveModel?> loginUser(String email, String password) async {
     final users = _authBox.values.where(
@@ -57,9 +63,7 @@ class HiveService {
   }
 
   //logout
-  Future<void> logoutUser() async {
-
-  }
+  Future<void> logoutUser() async {}
 
   //get current user
   AuthHiveModel? getCurrentUser(String authId) {

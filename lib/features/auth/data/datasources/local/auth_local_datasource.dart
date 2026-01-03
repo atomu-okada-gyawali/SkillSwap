@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:skillswap/core/services/hive/hive_service.dart';
 import 'package:skillswap/features/auth/data/datasources/remote/auth_datasource.dart';
 
@@ -18,42 +19,44 @@ class AuthLocalDatasource implements IAuthDatasource {
 
   @override
   bool isEmailExists(String email) {
-    final users = _authBox.values.where((user) => user.email == email);
-    return users.isNotEmpty;
+    try {
+      return _hiveService.isEmailExists(email);
+    } catch (_) {
+      return false;
+    }
   }
 
   @override
   Future<bool> logout() async {
     try {
       await _hiveService.logoutUser();
-      return Future.value(true);
-    } catch (e) {
-      return Future.value(false);
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 
   @override
-  Future<bool> register(AuthHiveModel model) {
+  Future<bool> register(AuthHiveModel model) async {
     try {
-      _hiveService.registerUser(model);
-      return Future.value(true);
-    } catch (e) {
-      return Future.value(false);
+      await _hiveService.registerUser(model);
+      return true;
+    } catch (_) {
+      return false;
     }
-  }
-
-  @override
-  Future<AuthHiveModel> getCurrentUser(String authId) {
-    return _authBox.get(authId);
   }
 
   @override
   Future<AuthHiveModel> login(String email, String password) async {
-    try {
-      final user = await _hiveService.loginUser(email, password);
-      return Future.value(user);
-    } catch (e) {
-      return Future.value(null);
-    }
+    final user = await _hiveService.loginUser(email, password);
+    if (user != null) return user;
+    throw Exception('Invalid credentials');
+  }
+
+  @override
+  Future<AuthHiveModel> getCurrentUser(String authId) async {
+    final user = _hiveService.getCurrentUser(authId);
+    if (user != null) return user;
+    throw Exception('User not found');
   }
 }
