@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:skillswap/app/themes/default_theme_data.dart';
 import 'package:skillswap/features/onboarding/presentation/pages/onboarding_screen.dart';
+import 'package:skillswap/features/splash/presentation/pages/splash_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -8,8 +10,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
-      home: OnboardingScreen(),
+      theme: AppTheme.lightTheme, // <- use your theme here
     );
   }
 }

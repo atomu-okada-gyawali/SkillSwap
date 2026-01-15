@@ -38,35 +38,52 @@ class HiveService {
   //Queries
 
   //====================Auth Queries====================
+
   Box<AuthHiveModel> get _authBox =>
       Hive.box<AuthHiveModel>(HiveTableConstant.authTable);
-  Future<AuthHiveModel> registerUser(AuthHiveModel model) async {
-    await _authBox.put(model.authId, model);
-    return model;
+
+  // Register user
+  Future<AuthHiveModel> register(AuthHiveModel user) async {
+    await _authBox.put(user.authId, user);
+    return user;
   }
 
-  //isemailexists
-  bool isEmailExists(String email) {
-    final users = _authBox.values.where((user) => user.email == email);
-    return users.isNotEmpty;
-  }
-
-  //Login
-  Future<AuthHiveModel?> loginUser(String email, String password) async {
-    final users = _authBox.values.where(
-      (user) => user.email == email && user.password == password,
-    );
-    if (users.isNotEmpty) {
-      return users.first;
+  // Login - find user by email and password
+  AuthHiveModel? login(String email, String password) {
+    try {
+      return _authBox.values.firstWhere(
+        (user) => user.email == email && user.password == password,
+      );
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
-  //logout
-  Future<void> logoutUser() async {}
-
-  //get current user
-  AuthHiveModel? getCurrentUser(String authId) {
+  // Get user by ID
+  AuthHiveModel? getUserById(String authId) {
     return _authBox.get(authId);
+  }
+
+  // Get user by email
+  AuthHiveModel? getUserByEmail(String email) {
+    try {
+      return _authBox.values.firstWhere((user) => user.email == email);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Update user
+  Future<bool> updateUser(AuthHiveModel user) async {
+    if (_authBox.containsKey(user.authId)) {
+      await _authBox.put(user.authId, user);
+      return true;
+    }
+    return false;
+  }
+
+  // Delete user
+  Future<void> deleteUser(String authId) async {
+    await _authBox.delete(authId);
   }
 }
