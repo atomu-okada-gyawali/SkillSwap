@@ -8,7 +8,7 @@ import 'package:skillswap/core/services/storage/user_session_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Hive local storage before the app starts
+  
   try {
     final hiveService = HiveService();
     await hiveService.init();

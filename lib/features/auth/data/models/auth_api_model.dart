@@ -1,6 +1,7 @@
 import 'package:skillswap/features/auth/domain/entities/auth_entity.dart';
 
 class AuthApiModel {
+  final String? id;
   final String fullName;
   final String email;
   final String? phoneNumber;
@@ -15,6 +16,7 @@ class AuthApiModel {
     required this.username,
     this.password,
     this.profilePicture,
+    this.id,
   });
 
   // toJSON
