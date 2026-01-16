@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/core/services/hive/hive_service.dart';
 import 'package:skillswap/core/services/storage/user_session_service.dart';
-import 'package:skillswap/features/auth/data/datasources/remote/auth_datasource.dart';
+import 'package:skillswap/features/auth/data/datasources/auth_datasource.dart';
 import 'package:skillswap/features/auth/data/models/auth_hive_model.dart';
 
 // Create provider
@@ -14,7 +14,7 @@ final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
   );
 });
 
-class AuthLocalDatasource implements IAuthDataSource {
+class AuthLocalDatasource implements IAuthLocalDataSource {
   final HiveService _hiveService;
   final UserSessionService _userSessionService;
 

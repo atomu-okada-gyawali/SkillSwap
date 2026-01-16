@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/core/constants/failures.dart';
+import 'package:skillswap/core/services/connectivity/network_info.dart';
 import 'package:skillswap/features/auth/data/datasources/local/auth_local_datasource.dart';
-import 'package:skillswap/features/auth/data/datasources/remote/auth_datasource.dart';
+import 'package:skillswap/features/auth/data/datasources/auth_datasource.dart';
+import 'package:skillswap/features/auth/data/datasources/remote/auth_remote_datasource.dart';
 import 'package:skillswap/features/auth/data/models/auth_hive_model.dart';
 import 'package:skillswap/features/auth/domain/entities/auth_entity.dart';
 import 'package:skillswap/features/auth/domain/repositories/auth_repository.dart';
@@ -10,13 +12,16 @@ import 'package:skillswap/features/auth/domain/repositories/auth_repository.dart
 // Create provider
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   final authDatasource = ref.read(authLocalDatasourceProvider);
+  final authRemoteDatasource = ref.read(authRemoteProvider);
   return AuthRepository(authDatasource: authDatasource);
 });
 
 class AuthRepository implements IAuthRepository {
-  final IAuthDataSource _authDataSource;
+  final IAuthLocalDataSource _authDataSource;
+  final IAuthRemoteDataSource _authRemoteDataSource;
+  final NetworkInfo _networkInfo;
 
-  AuthRepository({required IAuthDataSource authDatasource})
+  AuthRepository({required IAuthLocalDataSource authDatasource})
     : _authDataSource = authDatasource;
 
   @override
