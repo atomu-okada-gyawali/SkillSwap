@@ -3,11 +3,11 @@ import 'package:skillswap/features/auth/domain/usecases/login_usecase.dart';
 import 'package:skillswap/features/auth/domain/usecases/register_usecase.dart';
 import 'package:skillswap/features/auth/presentation/state/auth_state.dart';
 
-
 //provider
 final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
   () => AuthViewModel(),
 );
+
 class AuthViewModel extends Notifier<AuthState> {
   late final RegisterUsecase _registerUsecase;
   late final LoginUsecase _loginUsecase;
@@ -22,6 +22,8 @@ class AuthViewModel extends Notifier<AuthState> {
     required String username,
     required String email,
     required String password,
+    required String fullName,
+    required String confirmPassword,
   }) async {
     state = AuthState(status: AuthStatus.loading);
     final result = await _registerUsecase(
@@ -29,6 +31,8 @@ class AuthViewModel extends Notifier<AuthState> {
         username: username,
         email: email,
         password: password,
+        fullName: fullName,
+        confirmPassword: confirmPassword,
       ),
     );
 
@@ -49,12 +53,12 @@ class AuthViewModel extends Notifier<AuthState> {
 
   //login
   Future<void> login({
-    required String username,
+    required String email,
     required String password,
   }) async {
     state = AuthState(status: AuthStatus.loading);
     final result = await _loginUsecase(
-      LoginUsecaseParams(username: username, password: password),
+      LoginUsecaseParams(email: email, password: password),
     );
 
     result.fold(

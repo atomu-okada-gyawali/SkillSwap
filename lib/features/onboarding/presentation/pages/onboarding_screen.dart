@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/Widgets/onboarding_page.dart';
+import 'package:skillswap/features/onboarding/presentation/widgets/onboarding_page.dart';
 import 'package:skillswap/features/auth/presentation/widgets/purple_button.dart';
 import 'package:skillswap/features/auth/presentation/pages/auth_screen.dart';
 import 'package:skillswap/utils/my_colors.dart';

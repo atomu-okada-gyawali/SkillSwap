@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skillswap/Widgets/custom_field_text.dart';
+import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
 import 'package:skillswap/features/auth/presentation/state/auth_state.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:skillswap/features/auth/presentation/widgets/purple_button.dart';
@@ -19,6 +19,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
@@ -31,6 +32,8 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               username: _usernameController.text,
               email: _emailController.text,
               password: _passwordController.text,
+              fullName: _fullNameController.text,
+              confirmPassword: _confirmPasswordController.text,
             );
       } else {
         ScaffoldMessenger.of(
@@ -46,6 +49,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _fullNameController.dispose();
     super.dispose();
   }
 
@@ -100,6 +104,18 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               }
               if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                 return 'Please enter a valid email';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+          CustomTextFormField(
+            label: 'Fullname',
+            hint: 'FullName',
+            controller: _fullNameController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your fullname';
               }
               return null;
             },

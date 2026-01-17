@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/Widgets/ExplorePage/post_card.dart';
-import 'package:skillswap/Widgets/ExplorePage/tag.dart';
-import 'package:skillswap/Widgets/ExplorePage/welcome_card.dart';
+import 'package:skillswap/features/dashboard/presentation/widgets/post_card.dart';
+import 'package:skillswap/features/dashboard/presentation/widgets/tag.dart';
+import 'package:skillswap/features/dashboard/presentation/widgets/welcome_card.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
 class PostModel {

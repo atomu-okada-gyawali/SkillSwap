@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skillswap/Widgets/custom_field_text.dart';
+import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
 import 'package:skillswap/features/auth/presentation/state/auth_state.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:skillswap/features/auth/presentation/widgets/or_divider.dart';
@@ -26,7 +26,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
       ref
           .read(authViewModelProvider.notifier)
           .login(
-            username: _emailController.text,
+            email: _emailController.text,
             password: _passwordController.text,
           );
     }
