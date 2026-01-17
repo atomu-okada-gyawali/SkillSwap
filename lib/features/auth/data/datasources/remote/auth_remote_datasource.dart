@@ -44,7 +44,9 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         fullName: user.fullName,
         username: user.username,
       );
+      return user;
     }
+    return null;
   }
 
   @override

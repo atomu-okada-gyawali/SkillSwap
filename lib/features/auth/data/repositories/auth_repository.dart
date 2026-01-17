@@ -96,7 +96,7 @@ class AuthRepository implements IAuthRepository {
       } on DioException catch (e) {
         return Left(
           ApiFailure(
-            message: e.response?.data['message'] ?? 'Loginl failed',
+            message: e.response?.data['message'] ?? 'Login failed',
             statusCode: e.response?.statusCode,
           ),
         );

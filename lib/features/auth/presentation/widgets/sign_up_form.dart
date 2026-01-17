@@ -33,6 +33,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               email: _emailController.text,
               password: _passwordController.text,
               fullName: _fullNameController.text,
+              confirmPassword: _confirmPasswordController.text,
             );
       } else {
         ScaffoldMessenger.of(
@@ -48,6 +49,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _fullNameController.dispose();
     super.dispose();
   }
 

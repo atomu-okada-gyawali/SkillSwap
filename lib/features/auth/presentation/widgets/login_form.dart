@@ -26,7 +26,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
       ref
           .read(authViewModelProvider.notifier)
           .login(
-            username: _emailController.text,
+            email: _emailController.text,
             password: _passwordController.text,
           );
     }

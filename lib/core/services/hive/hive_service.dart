@@ -16,6 +16,7 @@ class HiveService {
     final path = '${directory.path}/${HiveTableConstant.dbName}';
     Hive.init(path);
     _registerAdapter();
+    await openBoxes();
   }
 
   //Register Adapters
