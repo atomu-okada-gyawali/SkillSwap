@@ -17,7 +17,7 @@ class LoginUsecaseParams extends Equatable {
   List<Object?> get props => [email, password];
 }
 
-//Provider for LoginUsecase
+
 final loginUsecaseProvider = Provider<LoginUsecase>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   return LoginUsecase(authRepository: authRepository);

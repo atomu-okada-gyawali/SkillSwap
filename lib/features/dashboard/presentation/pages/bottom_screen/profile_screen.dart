@@ -291,9 +291,9 @@ class MyBox extends StatelessWidget {
               0.2,
             ), // Shadow color and opacity
             offset: Offset(0, 5), // X, Y delta to the shadow's position
-            blurRadius: 3, // How hazy the shadow is
+            blurRadius: 3, 
             spreadRadius:
-                1, // How much the shadow spreads out (inflates the box)
+                1, 
           ),
         ],
         color: Colors.white,
