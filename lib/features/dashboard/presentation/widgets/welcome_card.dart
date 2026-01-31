@@ -26,7 +26,7 @@ class _WelcomeCardConsumerState extends ConsumerState<WelcomeCard> {
         ? NetworkImage(
             '${ApiEndpoints.baseUrl}auth/profile-image/$serverImageName',
           )
-        : const AssetImage('assets/images/profile.jpg');
+        : const AssetImage('assets/images/default-profile.jpg');
 
     return Card(
       color: MyColors.color4,

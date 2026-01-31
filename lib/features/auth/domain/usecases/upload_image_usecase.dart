@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/core/constants/failures.dart';
 import 'package:skillswap/core/usecases/app_usecase.dart';
 import 'package:skillswap/features/auth/data/repositories/auth_repository.dart';
+import 'package:skillswap/features/auth/domain/repositories/auth_repository.dart';
 
 //provider
 
@@ -14,11 +15,12 @@ final uploadPhotoUsecaseProvider = Provider<UploadPhotoUsecase>((ref) {
 });
 
 class UploadPhotoUsecase implements UsecaseWithParams<String, File> {
-  final AuthRepository _repository;
+  final IAuthRepository _repository;
 
-  UploadPhotoUsecase({required AuthRepository repository}) : _repository = repository;
+  UploadPhotoUsecase({required IAuthRepository repository})
+    : _repository = repository;
   @override
   Future<Either<Failure, String>> call(File params) {
-    return _repository.uploadProfilePicture( params);
+    return _repository.uploadProfilePicture(params);
   }
 }
