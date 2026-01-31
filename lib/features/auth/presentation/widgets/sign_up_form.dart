@@ -92,6 +92,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomTextFormField(
