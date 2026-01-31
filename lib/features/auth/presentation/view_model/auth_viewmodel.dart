@@ -6,7 +6,7 @@ import 'package:skillswap/features/auth/domain/usecases/register_usecase.dart';
 import 'package:skillswap/features/auth/domain/usecases/upload_image_usecase.dart';
 import 'package:skillswap/features/auth/presentation/state/auth_state.dart';
 
-//provider
+
 final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
   () => AuthViewModel(),
 );
@@ -56,7 +56,7 @@ class AuthViewModel extends Notifier<AuthState> {
     );
   }
 
-  //login
+
   Future<void> login({required String email, required String password}) async {
     state = AuthState(status: AuthStatus.loading);
     final result = await _loginUsecase(
