@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +14,7 @@ import 'package:skillswap/features/auth/domain/entities/auth_entity.dart';
 import 'package:skillswap/features/auth/domain/repositories/auth_repository.dart';
 
 // Create provider
-final authRepositoryProvider = Provider<IAuthRepository>((ref) {
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final authDatasource = ref.read(authLocalDatasourceProvider);
   final authRemoteDatasource = ref.read(authRemoteProvider);
   final networkInfo = ref.read(networkInfoProvider);
@@ -143,6 +145,32 @@ class AuthRepository implements IAuthRepository {
       return const Left(LocalDatabaseFailure(message: "Failed to logout"));
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadProfilePicture(File image) async {
+    //remote ma matra insert
+    if (await _networkInfo.isConnected) {
+      try {
+        final imageUrl = await _authRemoteDataSource.uploadProfilePicture(
+          image,
+        );
+        //fetch user
+        return Right(imageUrl);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message:
+                e.response?.data['message'] ?? e.message ?? 'Upload failed',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(ApiFailure(message: "No internet connection"));
     }
   }
 }

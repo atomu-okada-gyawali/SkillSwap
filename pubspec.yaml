@@ -66,6 +66,14 @@ dependencies:
   dio_smart_retry: ^7.0.1
   connectivity_plus: ^7.0.0
 
+  #MEdia Handling
+  flutter_image_compress: ^2.2.0
+  video_compress: ^3.1.4
+  image_picker: ^1.0.7
+  cached_network_image: ^3.3.1
+  # flutter_cached_manager: ^2.0.1
+  video_thumbnail: ^0.5.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -98,6 +106,7 @@ flutter:
     - assets/images/onboard1.svg
     - assets/images/onboard3.svg
     - assets/images/guitar.jpg
+    - assets/images/default-profile.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

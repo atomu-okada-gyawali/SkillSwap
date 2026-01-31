@@ -33,7 +33,6 @@ class UserSessionService {
     required String fullName,
     required String username,
     String? phoneNumber,
-
     String? profilePicture,
   }) async {
     await _prefs.setBool(_keyIsLoggedIn, true);
