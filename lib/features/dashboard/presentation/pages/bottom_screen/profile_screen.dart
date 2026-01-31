@@ -277,7 +277,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 class MyBox extends StatelessWidget {
   final IconData icon;
   final String text;
-  const MyBox({super.key, required this.icon, required this.text});
+  final String color;
+  const MyBox({super.key, required this.icon, required this.text, this.color = 'white'});
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +297,7 @@ class MyBox extends StatelessWidget {
                 1, 
           ),
         ],
-        color: Colors.white,
+        color: Colors.red,
         border: Border.all(color: MyColors.secondaryTextColor, width: 1),
       ),
       child: Row(
