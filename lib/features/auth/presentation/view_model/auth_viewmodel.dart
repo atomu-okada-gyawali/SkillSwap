@@ -6,7 +6,7 @@ import 'package:skillswap/features/auth/domain/usecases/register_usecase.dart';
 import 'package:skillswap/features/auth/domain/usecases/upload_image_usecase.dart';
 import 'package:skillswap/features/auth/presentation/state/auth_state.dart';
 
-//provider
+
 final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
   () => AuthViewModel(),
 );
