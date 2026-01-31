@@ -277,33 +277,36 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 class MyBox extends StatelessWidget {
   final IconData icon;
   final String text;
-  final String color;
-  const MyBox({super.key, required this.icon, required this.text, this.color = 'white'});
+  final Color? color;
+  const MyBox({super.key, required this.icon, required this.text, this.color});
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = color ?? Colors.white;
+    final fgColor = color == null ? Colors.black : Colors.white;
+
     return Container(
       padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: MyColors.secondaryTextColor.withOpacity(
-              0.2,
-            ),
-            offset: Offset(0, 5), 
-            blurRadius: 3, 
-            spreadRadius:
-                1, 
+            color: MyColors.secondaryTextColor.withOpacity(0.2),
+            offset: Offset(0, 5),
+            blurRadius: 3,
+            spreadRadius: 1,
           ),
         ],
-        color: Colors.red,
+        color: bgColor,
         border: Border.all(color: MyColors.secondaryTextColor, width: 1),
       ),
       child: Row(
         children: [
-          Icon(icon),
-          Text(text, style: TextStyle(fontSize: 15)),
+          Icon(icon, color: fgColor),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(text, style: TextStyle(fontSize: 15, color: fgColor)),
+          ),
         ],
       ),
     );
