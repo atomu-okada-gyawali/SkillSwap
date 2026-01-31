@@ -14,11 +14,13 @@ class AuthState extends Equatable {
   final AuthStatus status;
   final String? errorMessage;
   final AuthEntity? authEntity;
+  final String? uploadPhotoName;
 
   const AuthState({
     this.status = AuthStatus.initial,
     this.errorMessage,
     this.authEntity,
+    this.uploadPhotoName,
   });
 
   //copywith
@@ -26,14 +28,21 @@ class AuthState extends Equatable {
     AuthStatus? status,
     String? errorMessage,
     AuthEntity? authEntity,
+    String? uploadPhotoName,
   }) {
     return AuthState(
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       authEntity: authEntity ?? this.authEntity,
+      uploadPhotoName: uploadPhotoName ?? this.uploadPhotoName,
     );
   }
 
   @override
-  List<Object?> get props => [status, errorMessage, authEntity];
+  List<Object?> get props => [
+    status,
+    errorMessage,
+    authEntity,
+    uploadPhotoName,
+  ];
 }

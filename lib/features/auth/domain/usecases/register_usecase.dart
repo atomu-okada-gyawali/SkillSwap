@@ -45,7 +45,7 @@ class RegisterUsecase
       email: params.email,
       username: params.username,
       password: params.password,
-      fullName: params.username,
+      fullName: params.fullName,
       confirmPassword: params.confirmPassword,
     );
     return _authRepository.register(entity);

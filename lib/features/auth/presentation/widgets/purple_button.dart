@@ -13,14 +13,16 @@ class PurpleButton extends StatelessWidget {
       width: double.infinity,
       height: 55,
       child: ElevatedButton(
-        onPressed: onPressed ?? () {},
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: MyColors.color4,
+          backgroundColor: onPressed == null ? Colors.grey : MyColors.color4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          elevation: 5,
-          shadowColor: MyColors.color4.withAlpha(77),
+          elevation: onPressed == null ? 0 : 5,
+          shadowColor: onPressed == null
+              ? Colors.transparent
+              : MyColors.color4.withAlpha(77),
         ),
         child: Text(
           text,

@@ -14,6 +14,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
+  int _currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(
               child: PageView(
                 controller: _controller,
+                onPageChanged: (index) => setState(() => _currentPage = index),
                 children: [
                   OnboardPage(
                     image: "assets/images/onboard1.svg",
@@ -62,12 +64,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.all(20.0),
               child: PurpleButton(
                 text: "Get Started",
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AuthScreen()),
-                  );
-                },
+                onPressed: _currentPage == 2
+                    ? () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AuthScreen()),
+                        );
+                      }
+                    : null,
               ),
             ),
           ],

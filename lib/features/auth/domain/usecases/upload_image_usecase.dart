@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/core/constants/failures.dart';
@@ -5,19 +7,20 @@ import 'package:skillswap/core/usecases/app_usecase.dart';
 import 'package:skillswap/features/auth/data/repositories/auth_repository.dart';
 import 'package:skillswap/features/auth/domain/repositories/auth_repository.dart';
 
-final logoutUsecaseProvider = Provider<LogoutUsecase>((ref) {
+//provider
+
+final uploadPhotoUsecaseProvider = Provider<UploadPhotoUsecase>((ref) {
   final repository = ref.read(authRepositoryProvider);
-  return LogoutUsecase(authRepository: repository);
+  return UploadPhotoUsecase(repository: repository);
 });
 
-class LogoutUsecase implements UsecaseWithParams<bool, dynamic> {
+class UploadPhotoUsecase implements UsecaseWithParams<String, File> {
   final IAuthRepository _repository;
 
-  LogoutUsecase({required IAuthRepository authRepository})
-    : _repository = authRepository;
-
+  UploadPhotoUsecase({required IAuthRepository repository})
+    : _repository = repository;
   @override
-  Future<Either<Failure, bool>> call(dynamic params) {
-    return _repository.logout();
+  Future<Either<Failure, String>> call(File params) {
+    return _repository.uploadProfilePicture(params);
   }
 }

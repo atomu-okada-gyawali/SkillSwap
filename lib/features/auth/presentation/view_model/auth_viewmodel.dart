@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/auth/domain/usecases/login_usecase.dart';
 import 'package:skillswap/features/auth/domain/usecases/register_usecase.dart';
+import 'package:skillswap/features/auth/domain/usecases/upload_image_usecase.dart';
 import 'package:skillswap/features/auth/presentation/state/auth_state.dart';
 
 //provider
@@ -11,10 +14,12 @@ final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
 class AuthViewModel extends Notifier<AuthState> {
   late final RegisterUsecase _registerUsecase;
   late final LoginUsecase _loginUsecase;
+  late final UploadPhotoUsecase _uploadPhotoUsecase;
   @override
   AuthState build() {
     _registerUsecase = ref.read(registerUsecaseProvider);
     _loginUsecase = ref.read(loginUsecaseProvider);
+    _uploadPhotoUsecase = ref.read(uploadPhotoUsecaseProvider);
     return AuthState();
   }
 
@@ -52,10 +57,7 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   //login
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> login({required String email, required String password}) async {
     state = AuthState(status: AuthStatus.loading);
     final result = await _loginUsecase(
       LoginUsecaseParams(email: email, password: password),
@@ -72,6 +74,25 @@ class AuthViewModel extends Notifier<AuthState> {
         state = AuthState(
           status: AuthStatus.authenticated,
           authEntity: authEntity,
+        );
+      },
+    );
+  }
+
+  Future<void> uploadProfilePicture({required File photo}) async {
+    state = state.copywith(status: AuthStatus.loading);
+    final result = await _uploadPhotoUsecase(photo);
+    result.fold(
+      (failure) {
+        state = state.copywith(
+          status: AuthStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (photoName) {
+        state = state.copywith(
+          status: AuthStatus.authenticated,
+          uploadPhotoName: photoName,
         );
       },
     );
