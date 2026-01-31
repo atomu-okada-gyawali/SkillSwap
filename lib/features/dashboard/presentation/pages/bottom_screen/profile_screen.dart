@@ -289,8 +289,8 @@ class MyBox extends StatelessWidget {
           BoxShadow(
             color: MyColors.secondaryTextColor.withOpacity(
               0.2,
-            ), // Shadow color and opacity
-            offset: Offset(0, 5), // X, Y delta to the shadow's position
+            ),
+            offset: Offset(0, 5), 
             blurRadius: 3, 
             spreadRadius:
                 1, 
