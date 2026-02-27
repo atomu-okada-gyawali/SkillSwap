@@ -1,124 +1,105 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/dashboard/presentation/widgets/post_card.dart';
 import 'package:skillswap/features/dashboard/presentation/widgets/tag.dart';
 import 'package:skillswap/features/dashboard/presentation/widgets/welcome_card.dart';
+import 'package:skillswap/features/posts/presentation/pages/post_detail_screen.dart';
+import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
-class PostModel {
-  String title;
-  String author;
-  List<String> wantsToLearn;
-  String imagePath;
+class ExploreScreen extends ConsumerWidget {
+  const ExploreScreen({super.key});
 
-  PostModel({
-    required this.title,
-    required this.author,
-    required this.wantsToLearn,
-    required this.imagePath,
-  });
-}
-
-class TagModel {
-  String title;
-  String imagePath;
-  TagModel({required this.title, required this.imagePath});
-}
-
-class ExploreScreen extends StatefulWidget {
-  ExploreScreen({super.key});
-  final List<PostModel> _posts = [
-    PostModel(
-      title: "Looking to learn React",
-      author: "Aayush",
-      wantsToLearn: ["React", "JavaScript", "Frontend"],
-      imagePath: "assets/images/guitar.jpg",
-    ),
-    PostModel(
-      title: "Want to master Flutter",
-      author: "Suman",
-      wantsToLearn: ["Flutter", "Dart", "Mobile Development"],
-      imagePath: "assets/images/guitar.jpg",
-    ),
-    PostModel(
-      title: "Interested in Backend Development",
-      author: "Ritika",
-      wantsToLearn: ["Node.js", "Express", "MongoDB"],
-      imagePath: "assets/images/guitar.jpg",
-    ),
-    PostModel(
-      title: "Learning UI/UX Design",
-      author: "Nischal",
-      wantsToLearn: ["Figma", "UI Design", "UX Research"],
-      imagePath: "assets/images/guitar.jpg",
-    ),
-    PostModel(
-      title: "Getting started with Data Science",
-      author: "Prabin",
-      wantsToLearn: ["Python", "Pandas", "Machine Learning"],
-      imagePath: "assets/images/guitar.jpg",
-    ),
-  ];
-
-  final List<TagModel> tags = [
-    TagModel(title: "Programming", imagePath: "assets/images/guitar.jpg"),
-    TagModel(title: "Design", imagePath: "assets/images/guitar.jpg"),
-    TagModel(title: "Music", imagePath: "assets/images/guitar.jpg"),
-    TagModel(title: "Art", imagePath: "assets/images/guitar.jpg"),
-    TagModel(title: "Cooking", imagePath: "assets/images/guitar.jpg"),
-  ];
   @override
-  State<ExploreScreen> createState() => _ExploreScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final postsAsync = ref.watch(postsProvider);
+    final tagsAsync = ref.watch(tagsProvider);
 
-class _ExploreScreenState extends State<ExploreScreen> {
-  @override
-  Widget build(BuildContext context) {
+    final Map<String, String> tagMap = {};
+    tagsAsync.whenData((tags) {
+      for (var t in tags) {
+        if (t.id != null) {
+          tagMap[t.id!] = t.name;
+        }
+      }
+    });
+
     return SizedBox.expand(
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         color: MyColors.color1,
         child: Column(
           children: [
-            WelcomeCard(),
+            const WelcomeCard(),
             SizedBox(
               height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-
-                itemCount: widget.tags.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Tag(
-                    imagePath: widget.tags[index].imagePath,
-                    title: widget.tags[index].title,
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return SizedBox(width: 8);
-                },
+              child: tagsAsync.when(
+                data: (tags) => ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: tags.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Tag(
+                      imagePath: tags[index].tagImage ?? '',
+                      title: tags[index].name,
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(width: 8);
+                  },
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => const SizedBox.shrink(),
               ),
             ),
             Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 2.0,
-                  crossAxisSpacing: 2.0,
-                  childAspectRatio: 0.7,
+              child: postsAsync.when(
+                data: (posts) => GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 2.0,
+                    crossAxisSpacing: 2.0,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemCount: posts.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final post = posts[index];
+                    final tagNames = post.tag
+                        .map((tagId) => tagMap[tagId] ?? tagId)
+                        .toList();
+                    return PostCard(
+                      title: post.title,
+                      author: post.user?.username ?? 'Unknown',
+                      wantsToLearn: tagNames,
+                      imagePath: post.postPhoto ?? '',
+                      postId: post.id,
+                      onTap: () {
+                        if (post.id != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PostDetailScreen(postId: post.id!),
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  },
                 ),
-                itemCount: widget._posts.length,
-                itemBuilder: (BuildContext context, int index) {
-                  String title = widget._posts[index].title;
-                  String author = widget._posts[index].author;
-                  List<String> wantsToLearn = widget._posts[index].wantsToLearn;
-                  String imagePath = widget._posts[index].imagePath;
-
-                  return PostCard(
-                    title: title,
-                    author: author,
-                    wantsToLearn: wantsToLearn,
-                    imagePath: imagePath,
-                  );
-                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: $error'),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => ref.refresh(postsProvider),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
