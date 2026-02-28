@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
+import 'package:skillswap/features/profile/presentation/pages/edit_profile_screen.dart';
 import 'package:skillswap/utils/my_colors.dart';
 import 'package:skillswap/core/api/api_endpoints.dart';
 import 'package:skillswap/core/services/storage/user_session_service.dart';
@@ -132,8 +133,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authViewModelProvider);
+    final user = authState.authEntity;
     final serverImageName =
-        authState.authEntity?.profilePicture ??
+        user?.profilePicture ??
         authState.uploadPhotoName ??
         ref.read(userSessionServiceProvider).getCurrentUserProfilePicture();
 
@@ -204,7 +206,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                       SizedBox(height: 20),
                       Text(
-                        "Ramesh Chapagain",
+                        user?.fullName ?? 'Unknown',
                         style: TextStyle(
                           fontSize: 20,
                           color: MyColors.color1,
@@ -255,15 +257,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Column(
                     spacing: 7,
                     children: [
+                      MyBox(icon: Icons.mail, text: user?.email ?? 'No email'),
                       MyBox(
-                        icon: Icons.mail,
-                        text: "rameshchapagain@gmail.com",
+                        icon: Icons.person,
+                        text: '@${user?.username ?? 'unknown'}',
                       ),
-                      MyBox(icon: Icons.pin_drop, text: "New Baneshwor"),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const EditProfileScreen(),
+                            ),
+                          );
+                        },
+                        child: MyBox(
+                          icon: Icons.edit,
+                          text: "Edit Profile",
+                          color: MyColors.color1,
+                        ),
+                      ),
                     ],
                   ),
                   Expanded(child: SizedBox()),
-                  MyBox(icon: Icons.logout, text: "Logout"),
+                  MyBox(
+                    icon: Icons.logout,
+                    text: "Logout",
+                    color: Colors.red,
+                    onTap: () async {
+                      await ref.read(authViewModelProvider.notifier).logout();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -278,36 +302,46 @@ class MyBox extends StatelessWidget {
   final IconData icon;
   final String text;
   final Color? color;
-  const MyBox({super.key, required this.icon, required this.text, this.color});
+  final VoidCallback? onTap;
+  const MyBox({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.color,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final bgColor = color ?? Colors.white;
     final fgColor = color == null ? Colors.black : Colors.white;
 
-    return Container(
-      padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: MyColors.secondaryTextColor.withOpacity(0.2),
-            offset: Offset(0, 5),
-            blurRadius: 3,
-            spreadRadius: 1,
-          ),
-        ],
-        color: bgColor,
-        border: Border.all(color: MyColors.secondaryTextColor, width: 1),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: fgColor),
-          SizedBox(width: 10),
-          Expanded(
-            child: Text(text, style: TextStyle(fontSize: 15, color: fgColor)),
-          ),
-        ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: MyColors.secondaryTextColor.withOpacity(0.2),
+              offset: Offset(0, 5),
+              blurRadius: 3,
+              spreadRadius: 1,
+            ),
+          ],
+          color: bgColor,
+          border: Border.all(color: MyColors.secondaryTextColor, width: 1),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: fgColor),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(text, style: TextStyle(fontSize: 15, color: fgColor)),
+            ),
+          ],
+        ),
       ),
     );
   }

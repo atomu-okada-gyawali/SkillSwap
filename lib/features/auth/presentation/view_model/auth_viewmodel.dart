@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/auth/domain/usecases/login_usecase.dart';
+import 'package:skillswap/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:skillswap/features/auth/domain/usecases/register_usecase.dart';
 import 'package:skillswap/features/auth/domain/usecases/upload_image_usecase.dart';
 import 'package:skillswap/features/auth/presentation/state/auth_state.dart';
-
 
 final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
   () => AuthViewModel(),
@@ -15,11 +15,13 @@ class AuthViewModel extends Notifier<AuthState> {
   late final RegisterUsecase _registerUsecase;
   late final LoginUsecase _loginUsecase;
   late final UploadPhotoUsecase _uploadPhotoUsecase;
+  late final LogoutUsecase _logoutUsecase;
   @override
   AuthState build() {
     _registerUsecase = ref.read(registerUsecaseProvider);
     _loginUsecase = ref.read(loginUsecaseProvider);
     _uploadPhotoUsecase = ref.read(uploadPhotoUsecaseProvider);
+    _logoutUsecase = ref.read(logoutUsecaseProvider);
     return AuthState();
   }
 
@@ -55,7 +57,6 @@ class AuthViewModel extends Notifier<AuthState> {
       },
     );
   }
-
 
   Future<void> login({required String email, required String password}) async {
     state = AuthState(status: AuthStatus.loading);
@@ -96,5 +97,10 @@ class AuthViewModel extends Notifier<AuthState> {
         );
       },
     );
+  }
+
+  Future<void> logout() async {
+    await _logoutUsecase(null);
+    state = AuthState(status: AuthStatus.unauthenticated);
   }
 }
