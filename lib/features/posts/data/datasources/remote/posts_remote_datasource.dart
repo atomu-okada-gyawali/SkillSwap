@@ -26,7 +26,13 @@ class PostsRemoteDatasource {
        _tokenService = tokenService;
 
   Future<List<PostModel>> getPosts() async {
-    final response = await _apiClient.get(ApiEndpoints.posts);
+    final token = await _tokenService.getToken();
+    final response = await _apiClient.get(
+      ApiEndpoints.posts,
+      options: token != null
+          ? Options(headers: {'Authorization': 'Bearer $token'})
+          : null,
+    );
     if (response.data['success'] == true) {
       final data = response.data['data'] as List<dynamic>;
       return data.map((json) => PostModel.fromJson(json)).toList();
@@ -35,7 +41,13 @@ class PostsRemoteDatasource {
   }
 
   Future<PostModel> getPostById(String id) async {
-    final response = await _apiClient.get(ApiEndpoints.postById(id));
+    final token = await _tokenService.getToken();
+    final response = await _apiClient.get(
+      ApiEndpoints.postById(id),
+      options: token != null
+          ? Options(headers: {'Authorization': 'Bearer $token'})
+          : null,
+    );
     if (response.data['success'] == true) {
       final data = response.data['data'] as Map<String, dynamic>;
       return PostModel.fromJson(data);
@@ -44,7 +56,13 @@ class PostsRemoteDatasource {
   }
 
   Future<List<PostModel>> getMyPosts() async {
-    final response = await _apiClient.get(ApiEndpoints.myPosts);
+    final token = await _tokenService.getToken();
+    final response = await _apiClient.get(
+      ApiEndpoints.myPosts,
+      options: token != null
+          ? Options(headers: {'Authorization': 'Bearer $token'})
+          : null,
+    );
     if (response.data['success'] == true) {
       final data = response.data['data'] as List<dynamic>;
       return data.map((json) => PostModel.fromJson(json)).toList();
@@ -148,7 +166,13 @@ class PostsRemoteDatasource {
   }
 
   Future<List<TagModel>> getTags() async {
-    final response = await _apiClient.get(ApiEndpoints.tags);
+    final token = await _tokenService.getToken();
+    final response = await _apiClient.get(
+      ApiEndpoints.tags,
+      options: token != null
+          ? Options(headers: {'Authorization': 'Bearer $token'})
+          : null,
+    );
     if (response.data['success'] == true) {
       final data = response.data['data'] as List<dynamic>;
       return data.map((json) => TagModel.fromJson(json)).toList();
