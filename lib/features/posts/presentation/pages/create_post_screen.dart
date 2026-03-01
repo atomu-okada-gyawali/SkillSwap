@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
 import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -163,12 +164,11 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextFormField(
+              CustomTextFormField(
+                label: 'Title',
+                hint: 'Enter post title',
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  border: OutlineInputBorder(),
-                ),
+                prefixIcon: const Icon(Icons.title_outlined),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter a title';
@@ -177,13 +177,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
+              CustomTextFormField(
+                label: 'Description',
+                hint: 'Describe your post',
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
-                ),
                 maxLines: 4,
+                prefixIcon: const Icon(Icons.description_outlined),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter a description';
@@ -234,13 +233,11 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
+              CustomTextFormField(
+                label: 'Duration (optional)',
+                hint: 'e.g., 2 hours/week',
                 controller: _durationController,
-                decoration: const InputDecoration(
-                  labelText: 'Duration (optional)',
-                  border: OutlineInputBorder(),
-                  hintText: 'e.g., 2 hours/week',
-                ),
+                prefixIcon: const Icon(Icons.schedule_outlined),
               ),
               const SizedBox(height: 16),
               const Text(
@@ -251,12 +248,11 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
+                    child: CustomTextFormField(
+                      label: 'Add requirement',
+                      hint: 'Enter a requirement',
                       controller: _requirementController,
-                      decoration: const InputDecoration(
-                        labelText: 'Add requirement',
-                        border: OutlineInputBorder(),
-                      ),
+                      prefixIcon: const Icon(Icons.add_task_outlined),
                     ),
                   ),
                   const SizedBox(width: 8),

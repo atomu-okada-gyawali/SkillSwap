@@ -97,8 +97,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
         children: [
           CustomTextFormField(
             label: 'Your Email',
-            hint: 'Email',
+            hint: 'Enter your email',
             controller: _emailController,
+            prefixIcon: const Icon(Icons.email_outlined),
+            keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your email';
@@ -112,8 +114,9 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           const SizedBox(height: 20),
           CustomTextFormField(
             label: 'Fullname',
-            hint: 'FullName',
+            hint: 'Enter your full name',
             controller: _fullNameController,
+            prefixIcon: const Icon(Icons.person_outlined),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your fullname';
@@ -124,8 +127,9 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           const SizedBox(height: 20),
           CustomTextFormField(
             label: 'Username',
-            hint: 'Username',
+            hint: 'Choose a username',
             controller: _usernameController,
+            prefixIcon: const Icon(Icons.alternate_email_outlined),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your username';
@@ -136,9 +140,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           const SizedBox(height: 20),
           CustomTextFormField(
             label: 'Password',
-            hint: '••••••••••',
+            hint: 'Create a password',
             obscureText: true,
             controller: _passwordController,
+            prefixIcon: const Icon(Icons.lock_outlined),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your password';
@@ -152,9 +157,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           const SizedBox(height: 20),
           CustomTextFormField(
             label: 'Confirm Password',
-            hint: '••••••••••',
+            hint: 'Confirm your password',
             obscureText: true,
             controller: _confirmPasswordController,
+            prefixIcon: const Icon(Icons.lock_outlined),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please confirm your password';

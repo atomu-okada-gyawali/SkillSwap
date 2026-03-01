@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
+import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
 import 'package:skillswap/features/profile/presentation/providers/profile_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -73,13 +74,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(
+              CustomTextFormField(
+                label: 'Full Name',
+                hint: 'Enter your full name',
                 controller: _fullNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Full Name',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
-                ),
+                prefixIcon: const Icon(Icons.person_outlined),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter your full name';
@@ -88,13 +87,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
+              CustomTextFormField(
+                label: 'Username',
+                hint: 'Enter your username',
                 controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.alternate_email),
-                ),
+                prefixIcon: const Icon(Icons.alternate_email_outlined),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter your username';

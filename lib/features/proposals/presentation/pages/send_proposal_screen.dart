@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
 import 'package:skillswap/features/posts/data/models/post_model.dart';
 import 'package:skillswap/features/proposals/presentation/providers/proposals_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
@@ -147,13 +148,11 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              TextFormField(
+              CustomTextFormField(
+                label: 'Your skill',
+                hint: 'e.g., Python programming, Guitar lessons',
                 controller: _skillController,
-                decoration: const InputDecoration(
-                  labelText: 'Your skill',
-                  border: OutlineInputBorder(),
-                  hintText: 'e.g., Python programming, Guitar lessons',
-                ),
+                prefixIcon: const Icon(Icons.lightbulb_outlined),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter a skill you can offer';
@@ -167,15 +166,13 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              TextFormField(
+              CustomTextFormField(
+                label: 'Your message',
+                hint:
+                    'Introduce yourself and explain why you want to learn this skill...',
                 controller: _messageController,
-                decoration: const InputDecoration(
-                  labelText: 'Your message',
-                  border: OutlineInputBorder(),
-                  hintText:
-                      'Introduce yourself and explain why you want to learn this skill...',
-                ),
                 maxLines: 5,
+                prefixIcon: const Icon(Icons.message_outlined),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter a message';
