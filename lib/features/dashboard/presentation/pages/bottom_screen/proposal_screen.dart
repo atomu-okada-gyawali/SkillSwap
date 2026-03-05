@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:skillswap/features/proposals/data/models/proposal_model.dart';
-import 'package:skillswap/features/proposals/presentation/providers/proposals_provider.dart';
+import 'package:skillswap/features/proposals/presentation/view_model/proposals_viewmodel.dart';
 import 'package:skillswap/features/proposals/presentation/pages/proposal_detail_screen.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -11,7 +11,7 @@ class ProposalScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final proposalsAsync = ref.watch(proposalsProvider);
+    final proposalsAsync = ref.watch(proposalsViewModelProvider);
     final authState = ref.watch(authViewModelProvider);
     final currentUserId = authState.authEntity?.authId;
 
@@ -61,7 +61,7 @@ class ProposalScreen extends ConsumerWidget {
                       Text('Error: $error'),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () => ref.refresh(proposalsProvider),
+                        onPressed: () => ref.refresh(proposalsViewModelProvider),
                         child: const Text('Retry'),
                       ),
                     ],

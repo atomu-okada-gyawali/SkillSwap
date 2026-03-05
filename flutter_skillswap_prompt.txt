@@ -1,0 +1,310 @@
+================================================================================
+                    AI INSTRUCTION PROMPT: SKILLSWAP MOBILE APP
+================================================================================
+You are an expert Flutter developer. Your task is to implement the "SkillSwap" 
+mobile application by strictly following this comprehensive implementation plan.
+This document outlines everything you need: architecture, data models mirroring 
+our backend, state management, file structure, and implementation order.
+
+================================================================================
+                              TABLE OF CONTENTS
+================================================================================
+1. PROJECT OVERVIEW
+2. CURRENT STATE ANALYSIS
+3. ARCHITECTURE DECISIONS
+4. API CONFIGURATION
+5. DATA MODELS SPECIFICATION
+6. FEATURE IMPLEMENTATION DETAILS
+7. API ENDPOINTS REFERENCE
+8. FILE STRUCTURE
+9. IMPLEMENTATION ORDER
+10. CODE CONVENTIONS
+11. OPEN QUESTIONS / NOTES
+
+================================================================================
+                         1. PROJECT OVERVIEW
+================================================================================
+Project Name: SkillSwap Mobile App
+Purpose: A skill exchange platform where users can post skills they want to 
+         teach/learn, connect with others through proposals, and chat in real-time.
+Platform: Flutter Mobile (iOS/Android)
+Backend: Express/MongoDB at http://192.168.x.x:5050 (or localhost for emulators)
+
+================================================================================
+                      2. CURRENT STATE ANALYSIS
+================================================================================
+
+--- BASELINE EXPECTATION ---
+Assume the project starts completely from scratch. However, your first milestone 
+MUST establish the following robust foundation before building features:
+
+✅ Authentication System
+   - Login with email/password
+   - Register with username, email, password, full name
+   - JWT token management via flutter_secure_storage
+   - Token stored with key: 'auth_token'
+
+✅ API Client
+   - Dio-based HTTP client
+   - JWT interceptor (adds Authorization header)
+   - Auto-retry on connection timeout
+   - Base URL from EnvironmentConfig
+
+✅ Repository Pattern
+   - Domain layer with entities and repository interfaces
+   - Data layer with models, datasources, repository implementations
+   - Offline support using Hive for local caching
+   - Error handling using dartz Either<Failure, Success>
+
+✅ State Management
+   - Riverpod (flutter_riverpod)
+   - Providers for datasources, repositories, viewmodels
+
+✅ Basic UI Structure
+   - Splash Screen
+   - Auth Screen (Login/Register forms)
+   - Dashboard with bottom navigation (Explore, Proposals, Messages, Profile)
+
+================================================================================
+                       3. ARCHITECTURE DECISIONS
+================================================================================
+
+STATE MANAGEMENT
+   Tool: flutter_riverpod
+   Pattern: Providers + StateNotifier/AsyncNotifier
+
+ROUTING
+   Tool: Flutter Navigator or GoRouter (GoRouter preferred for deep linking)
+
+JSON SERIALIZATION
+   Tool: freeezed + json_annotation + json_serializable
+   Why: Automatic fromJson/toJson, immutability, union types for states.
+   Command: dart run build_runner build --delete-conflicting-outputs
+
+OFFLINE MODE
+   Strategy: Cache posts, tags, and profiles in Hive.
+   Flow: 
+     1. Check network connectivity (internet_connection_checker)
+     2. If online: fetch from API, update local cache
+     3. If offline: return cached data from Hive
+
+IMAGE UPLOAD
+   Method: multipart/form-data via Dio (used for profile pictures and post photos)
+
+REAL-TIME
+   Tool: socket_io_client mapping to the backend Socket.io server for the chat.
+
+================================================================================
+                        4. API CONFIGURATION
+================================================================================
+
+BASE URL
+   Source: EnvironmentConfig.getBaseUrl()
+   Expected: e.g., http://10.0.2.2:5050/api (Android Emulator) or specified IP.
+
+AUTHENTICATION
+   Method: JWT Bearer token
+   Storage: flutter_secure_storage with key 'auth_token'
+   Header: Authorization: Bearer <token>
+
+ERROR HANDLING
+   Success response: { "success": true, "data": {...} }
+   Error response: { "success": false, "message": "..." }
+   Always map HTTP errors to Failure classes (e.g., ServerFailure, NetworkFailure).
+
+================================================================================
+                     5. DATA MODELS SPECIFICATION
+================================================================================
+
+--- USER MODEL ---
+Fields:
+   - _id: String
+   - email: String
+   - password: String (only for auth requests)
+   - username: String
+   - fullName: String
+   - profilePicture: String? (URL)
+   - role: String ("user" | "admin")
+   - createdAt: DateTime
+   - updatedAt: DateTime
+
+--- POST MODEL ---
+Fields:
+   - _id: String
+   - userId: User (embedded or String reference)
+   - title: String
+   - description: String
+   - postPhoto: String? (URL)
+   - tag: String? (tag reference)
+   - requirements: List<String>
+   - locationType: String ("remote" | "onsite" | "hybrid")
+   - availability: String ("full-time" | "part-time" | "weekends" | "flexible")
+   - duration: String?
+   - createdAt: DateTime
+   - updatedAt: DateTime
+
+--- PROPOSAL MODEL ---
+Fields:
+   - _id: String
+   - senderId: User (embedded or String map)
+   - receiverId: User
+   - postId: Post
+   - offeredSkill: Post (the sender's post)
+   - message: String
+   - status: String ("pending" | "accepted" | "rejected" | "cancelled")
+   - createdAt: DateTime
+   - updatedAt: DateTime
+
+--- CHAT & MESSAGE MODEL ---
+Fields (Chat):
+   - _id: String
+   - participants: List<User>
+   - lastMessage: String
+   - updatedAt: DateTime
+
+Fields (Message):
+   - _id: String
+   - chatId: String
+   - senderId: String
+   - content: String
+   - createdAt: DateTime
+
+--- TAG MODEL ---
+Fields:
+   - _id: String
+   - name: String
+   - tagImage: String? (URL)
+   - createdAt: DateTime
+   - updatedAt: DateTime
+
+================================================================================
+                  6. FEATURE IMPLEMENTATION DETAILS
+================================================================================
+
+--- FEATURE: AUTHENTICATION ---
+Goal: Secure user entry.
+Validation: Email regex, password length > 6, username uniqueness.
+
+--- FEATURE: POSTS (EXPLORE SCREEN) ---
+Goal: Display all skill posts, allow create/edit/delete.
+Screens: ExploreScreen, PostDetailScreen, CreatePostScreen, EditPostScreen.
+Flow: Fetch posts -> 2-column grid -> Tap -> PostDetailScreen -> Check ownership -> Show Edit/Delete OR Send Proposal.
+Fields for Create: Title, Description, Image Upload, Requirements List (dynamic fields), Tags (dropdown), LocationType, Availability, Duration.
+
+--- FEATURE: PROPOSALS ---
+Goal: Connect with post owners via skill exchange proposals.
+Screens: ProposalScreen (Tabs: Sent/Received), ProposalDetailScreen, SendProposalScreen.
+Flow: Select Post -> Tap "Send Proposal" -> Pick one of *your* posts -> Add message -> Send -> Show in Sent list.
+Status transitions: Pending -> Accepted / Rejected.
+
+--- FEATURE: MESSAGES ---
+Goal: Real-time chat for accepted proposals or direct contact.
+Flow: Chat list screen -> Chat Detail screen -> initialize Socket -> listen 'receive_message' -> emit 'send_message'.
+
+--- FEATURE: PROFILE ---
+Goal: View and edit user profile.
+Flow: View own stats -> Edit profile (fullName, username, upload new profilePicture) -> Save (PUT request) -> Reload.
+
+================================================================================
+                      7. API ENDPOINTS REFERENCE
+================================================================================
+
+AUTH ENDPOINTS
+   POST   /api/auth/register    - Register
+   POST   /api/auth/login       - Login
+   GET    /api/auth/me          - Get current user
+
+POSTS ENDPOINTS
+   POST   /api/post             - Create post
+   GET    /api/post             - List posts
+   GET    /api/post/:id         - Get post
+   PUT    /api/post/:id         - Update post
+   DELETE /api/post/:id         - Delete post
+   GET    /api/post/users/:uid  - Get posts by user
+
+PROPOSALS ENDPOINTS
+   POST   /api/proposal             - Create proposal
+   GET    /api/proposal/receiver    - Get received proposals
+   GET    /api/proposal/sender      - Get sent proposals
+   PATCH  /api/proposal/:id/status  - Update proposal status (accepted/rejected)
+
+CHAT ENDPOINTS
+   POST   /api/chat             - Create/Get chat room
+   GET    /api/chat/user/:userId- Get user's chats
+   POST   /api/message          - Send message (fallback for socket)
+   GET    /api/message/:chatId  - Get chat history
+
+TAG ENDPOINTS
+   GET    /api/tags             - List tags
+
+================================================================================
+                        8. FILE STRUCTURE
+================================================================================
+
+Strictly use feature-first structure:
+
+lib/
+├── main.dart
+├── core/
+│   ├── network/ (dio client, interceptors, endpoints)
+│   ├── error/ (failures, exceptions)
+│   ├── usecases/ (base usecase)
+│   ├── theme/
+│   └── constants/
+├── features/
+│   ├── auth/
+│   │   ├── data/ (models, datasources, repositories)
+│   │   ├── domain/ (entities, repository interfaces, usecases)
+│   │   └── presentation/ (pages, providers, widgets)
+│   ├── posts/
+│   ├── proposals/
+│   ├── chat/
+│   └── profile/
+└── shared/ (common widgets like loading spinners, generic buttons)
+
+================================================================================
+                      9. IMPLEMENTATION ORDER
+================================================================================
+
+PHASE 1: CORE & AUTH
+   1.1 Setup core network, error handling, local storage (Hive).
+   1.2 Implement Auth models, datasources, repository.
+   1.3 Build Login & Register screens + Riverpod state.
+
+PHASE 2: EXPLORE & POSTS
+   2.1 Models: Post, Tag.
+   2.2 Fetch and display posts in ExploreScreen.
+   2.3 Build PostDetailScreen.
+   2.4 Build Create/Edit post forms with image upload.
+
+PHASE 3: PROPOSALS
+   3.1 Model: Proposal.
+   3.2 SendProposalScreen (picking own post mapping to offeredSkill).
+   3.3 Received/Sent Tabs with Accept/Reject actions.
+
+PHASE 4: CHAT & PROFILE
+   4.1 Model: Chat, Message.
+   4.2 Chat room list and Chat real-time screen (Socket.io).
+   4.3 Profile display and Edit Profile functionality.
+
+================================================================================
+                      10. CODE CONVENTIONS
+================================================================================
+
+- Use `json_serializable` for JSON serialization.
+- Use `dartz` `Either<Failure, DefaultType>` for repository returns.
+- AsyncNotifier classes must handle loading and error states strictly. Use `.when()` on AsyncValue in UI.
+- All files: `snake_case`. All classes: `PascalCase`.
+- Build forms using `react_hook_form` logic or Riverpod's state, avoiding monolithic Stateful widgets with dozens of text controllers. Use `flutter_hooks` if comfortable.
+
+================================================================================
+                      11. OPEN QUESTIONS / NOTES
+================================================================================
+
+- Ensure `multipart/form-data` is correctly formatted in Dio instances for post photos and profile icons.
+- Check backend mapping for User IDs populated inside the Post queries vs just string refererences. The models should probably gracefully parse both full objects or string IDs.
+- For AI generation: Ask the user for clarification if the backend returns nested objects where you expect primitive IDs.
+
+================================================================================
+                              END OF DOCUMENT
+================================================================================

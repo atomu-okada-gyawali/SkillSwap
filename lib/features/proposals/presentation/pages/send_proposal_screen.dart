@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
 import 'package:skillswap/features/posts/data/models/post_model.dart';
-import 'package:skillswap/features/proposals/presentation/providers/proposals_provider.dart';
+import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
+import 'package:skillswap/features/proposals/presentation/view_model/proposals_viewmodel.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
 class SendProposalScreen extends ConsumerStatefulWidget {
@@ -26,13 +27,12 @@ class SendProposalScreen extends ConsumerStatefulWidget {
 class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
   final _formKey = GlobalKey<FormState>();
   final _messageController = TextEditingController();
-  final _skillController = TextEditingController();
+  String? _selectedPostId;
   bool _isLoading = false;
 
   @override
   void dispose() {
     _messageController.dispose();
-    _skillController.dispose();
     super.dispose();
   }
 
@@ -45,11 +45,11 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
 
     try {
       await ref
-          .read(proposalsProvider.notifier)
+          .read(proposalsViewModelProvider.notifier)
           .createProposal(
             receiverId: widget.receiverId,
             postId: widget.postId,
-            offeredSkill: _skillController.text.trim(),
+            offeredSkill: _selectedPostId ?? '',
             message: _messageController.text.trim(),
           );
 
@@ -76,6 +76,8 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final myPostsAsync = ref.watch(myPostsProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Send Proposal'),
@@ -148,17 +150,44 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              CustomTextFormField(
-                label: 'Your skill',
-                hint: 'e.g., Python programming, Guitar lessons',
-                controller: _skillController,
-                prefixIcon: const Icon(Icons.lightbulb_outlined),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a skill you can offer';
+              myPostsAsync.when(
+                data: (posts) {
+                  if (posts.isEmpty) {
+                    return const Text(
+                      'You have no posts to offer. Please create a post first.',
+                      style: TextStyle(color: Colors.red),
+                    );
                   }
-                  return null;
+                  return DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Select your post',
+                      prefixIcon: const Icon(Icons.post_add),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    value: _selectedPostId,
+                    items: posts.map((post) {
+                      return DropdownMenuItem(
+                        value: post.id,
+                        child: Text(post.title),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedPostId = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a post to offer';
+                      }
+                      return null;
+                    },
+                  );
                 },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Text('Error loading your posts: $err'),
               ),
               const SizedBox(height: 16),
               const Text(

@@ -5,8 +5,9 @@ import 'package:skillswap/core/constants/failures.dart';
 import 'package:skillswap/core/services/connectivity/network_info.dart';
 import 'package:skillswap/features/proposals/data/datasources/remote/proposals_remote_datasource.dart';
 import 'package:skillswap/features/proposals/data/models/proposal_model.dart';
+import 'package:skillswap/features/proposals/domain/repositories/proposals_repository_interface.dart';
 
-final proposalsRepositoryProvider = Provider<ProposalsRepository>((ref) {
+final proposalsRepositoryProvider = Provider<IProposalsRepository>((ref) {
   final proposalsRemoteDatasource = ref.read(proposalsRemoteDatasourceProvider);
   final networkInfo = ref.read(networkInfoProvider);
   return ProposalsRepository(
@@ -15,7 +16,7 @@ final proposalsRepositoryProvider = Provider<ProposalsRepository>((ref) {
   );
 });
 
-class ProposalsRepository {
+class ProposalsRepository implements IProposalsRepository {
   final ProposalsRemoteDatasource _proposalsRemoteDatasource;
   final NetworkInfo _networkInfo;
 

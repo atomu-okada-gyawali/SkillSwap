@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
-import 'package:skillswap/features/proposals/presentation/providers/proposals_provider.dart';
+import 'package:skillswap/features/proposals/presentation/view_model/proposals_viewmodel.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
 class ProposalDetailScreen extends ConsumerWidget {
@@ -135,7 +135,7 @@ class ProposalDetailScreen extends ConsumerWidget {
 
   void _handleAccept(BuildContext context, WidgetRef ref) async {
     try {
-      await ref.read(proposalsProvider.notifier).acceptProposal(proposalId);
+      await ref.read(proposalsViewModelProvider.notifier).acceptProposal(proposalId);
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
@@ -152,7 +152,7 @@ class ProposalDetailScreen extends ConsumerWidget {
 
   void _handleReject(BuildContext context, WidgetRef ref) async {
     try {
-      await ref.read(proposalsProvider.notifier).rejectProposal(proposalId);
+      await ref.read(proposalsViewModelProvider.notifier).rejectProposal(proposalId);
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,

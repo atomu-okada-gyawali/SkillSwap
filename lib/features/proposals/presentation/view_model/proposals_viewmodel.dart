@@ -1,22 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:skillswap/features/proposals/data/models/proposal_model.dart';
-import 'package:skillswap/features/proposals/data/repositories/proposals_repository.dart';
+import 'package:skillswap/features/proposals/domain/usecases/accept_proposal_usecase.dart';
+import 'package:skillswap/features/proposals/domain/usecases/create_proposal_usecase.dart';
+import 'package:skillswap/features/proposals/domain/usecases/get_proposals_usecase.dart';
+import 'package:skillswap/features/proposals/domain/usecases/reject_proposal_usecase.dart';
 
-final proposalsProvider =
-    AsyncNotifierProvider<ProposalsNotifier, List<ProposalModel>>(() {
-      return ProposalsNotifier();
+final proposalsViewModelProvider =
+    AsyncNotifierProvider<ProposalsViewModel, List<ProposalModel>>(() {
+      return ProposalsViewModel();
     });
 
-class ProposalsNotifier extends AsyncNotifier<List<ProposalModel>> {
+class ProposalsViewModel extends AsyncNotifier<List<ProposalModel>> {
   @override
   Future<List<ProposalModel>> build() async {
     return _fetchProposals();
   }
 
   Future<List<ProposalModel>> _fetchProposals() async {
-    final repository = ref.read(proposalsRepositoryProvider);
-    final result = await repository.getProposals();
+    final getProposals = ref.read(getProposalsUsecaseProvider);
+    final result = await getProposals();
     return result.fold(
       (failure) => throw Exception(failure.message),
       (proposals) => proposals,
@@ -34,7 +37,7 @@ class ProposalsNotifier extends AsyncNotifier<List<ProposalModel>> {
     required String offeredSkill,
     required String message,
   }) async {
-    final repository = ref.read(proposalsRepositoryProvider);
+    final createProposal = ref.read(createProposalUsecaseProvider);
 
     final proposal = ProposalModel(
       receiverId: receiverId,
@@ -43,7 +46,9 @@ class ProposalsNotifier extends AsyncNotifier<List<ProposalModel>> {
       message: message,
     );
 
-    final result = await repository.createProposal(proposal);
+    final result = await createProposal(
+      CreateProposalParams(proposal: proposal),
+    );
 
     result.fold((failure) => throw Exception(failure.message), (
       createdProposal,
@@ -53,8 +58,8 @@ class ProposalsNotifier extends AsyncNotifier<List<ProposalModel>> {
   }
 
   Future<void> acceptProposal(String id) async {
-    final repository = ref.read(proposalsRepositoryProvider);
-    final result = await repository.acceptProposal(id);
+    final acceptProposal = ref.read(acceptProposalUsecaseProvider);
+    final result = await acceptProposal(AcceptProposalParams(id: id));
 
     result.fold((failure) => throw Exception(failure.message), (
       updatedProposal,
@@ -67,8 +72,8 @@ class ProposalsNotifier extends AsyncNotifier<List<ProposalModel>> {
   }
 
   Future<void> rejectProposal(String id) async {
-    final repository = ref.read(proposalsRepositoryProvider);
-    final result = await repository.rejectProposal(id);
+    final rejectProposal = ref.read(rejectProposalUsecaseProvider);
+    final result = await rejectProposal(RejectProposalParams(id: id));
 
     result.fold((failure) => throw Exception(failure.message), (
       updatedProposal,
@@ -81,8 +86,9 @@ class ProposalsNotifier extends AsyncNotifier<List<ProposalModel>> {
   }
 }
 
+// Helper providers for filtered lists
 final sentProposalsProvider = Provider<List<ProposalModel>>((ref) {
-  final proposalsAsync = ref.watch(proposalsProvider);
+  final proposalsAsync = ref.watch(proposalsViewModelProvider);
   final authState = ref.watch(authViewModelProvider);
   final currentUserId = authState.authEntity?.authId;
 
@@ -94,7 +100,7 @@ final sentProposalsProvider = Provider<List<ProposalModel>>((ref) {
 });
 
 final receivedProposalsProvider = Provider<List<ProposalModel>>((ref) {
-  final proposalsAsync = ref.watch(proposalsProvider);
+  final proposalsAsync = ref.watch(proposalsViewModelProvider);
   final authState = ref.watch(authViewModelProvider);
   final currentUserId = authState.authEntity?.authId;
 
@@ -109,10 +115,25 @@ final selectedProposalProvider = FutureProvider.family<ProposalModel, String>((
   ref,
   id,
 ) async {
-  final repository = ref.read(proposalsRepositoryProvider);
-  final result = await repository.getProposalById(id);
+  // Try to find it in the current state first
+  final currentProposals = ref.read(proposalsViewModelProvider).value;
+  if (currentProposals != null) {
+    try {
+      final found = currentProposals.firstWhere((p) => p.id == id);
+      return found;
+    } catch (_) {
+      // If not found in cache, fall back to fetching manually (or we could expose a getting usecase for single ID)
+      // We don't have GetProposalByIdUsecase yet, but we can iterate the list from the remote
+    }
+  }
+  
+  // As a fallback, since we only made getProposals (all), we fetch all and filter
+  // Alternatively, we should make GetProposalByIdUsecase. Let's create it later if really needed, 
+  // but for now relying on the cached state is usually sufficient for detail screens.
+  final getProposals = ref.read(getProposalsUsecaseProvider);
+  final result = await getProposals();
   return result.fold(
     (failure) => throw Exception(failure.message),
-    (proposal) => proposal,
+    (proposals) => proposals.firstWhere((p) => p.id == id, orElse: () => throw Exception('Proposal not found')),
   );
 });
