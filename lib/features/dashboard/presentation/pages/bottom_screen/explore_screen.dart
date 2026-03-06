@@ -5,6 +5,7 @@ import 'package:skillswap/features/dashboard/presentation/widgets/tag.dart';
 import 'package:skillswap/features/dashboard/presentation/widgets/welcome_card.dart';
 import 'package:skillswap/features/posts/presentation/pages/post_detail_screen.dart';
 import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
+import 'package:skillswap/features/tags/presentation/providers/tags_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
 class ExploreScreen extends ConsumerWidget {

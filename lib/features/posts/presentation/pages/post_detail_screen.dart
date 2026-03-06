@@ -5,6 +5,7 @@ import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.d
 import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
 import 'package:skillswap/features/posts/presentation/pages/edit_post_screen.dart';
 import 'package:skillswap/features/proposals/presentation/pages/send_proposal_screen.dart';
+import 'package:skillswap/features/tags/presentation/providers/tags_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
 class PostDetailScreen extends ConsumerWidget {

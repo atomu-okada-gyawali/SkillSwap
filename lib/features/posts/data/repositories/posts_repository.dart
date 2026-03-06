@@ -7,7 +7,6 @@ import 'package:skillswap/core/constants/failures.dart';
 import 'package:skillswap/core/services/connectivity/network_info.dart';
 import 'package:skillswap/features/posts/data/datasources/remote/posts_remote_datasource.dart';
 import 'package:skillswap/features/posts/data/models/post_model.dart';
-import 'package:skillswap/features/posts/data/models/tag_model.dart';
 
 final postsRepositoryProvider = Provider<PostsRepository>((ref) {
   final postsRemoteDatasource = ref.read(postsRemoteDatasourceProvider);
@@ -178,26 +177,6 @@ class PostsRepository {
         return Left(
           ApiFailure(
             message: e.response?.data['message'] ?? 'Failed to delete post',
-            statusCode: e.response?.statusCode,
-          ),
-        );
-      } catch (e) {
-        return Left(ApiFailure(message: e.toString()));
-      }
-    } else {
-      return const Left(ApiFailure(message: 'No internet connection'));
-    }
-  }
-
-  Future<Either<Failure, List<TagModel>>> getTags() async {
-    if (await _networkInfo.isConnected) {
-      try {
-        final tags = await _postsRemoteDatasource.getTags();
-        return Right(tags);
-      } on DioException catch (e) {
-        return Left(
-          ApiFailure(
-            message: e.response?.data['message'] ?? 'Failed to fetch tags',
             statusCode: e.response?.statusCode,
           ),
         );

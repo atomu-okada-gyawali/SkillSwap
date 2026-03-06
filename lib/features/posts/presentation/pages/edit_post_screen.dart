@@ -7,6 +7,7 @@ import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.d
 import 'package:skillswap/features/posts/data/models/post_model.dart';
 import 'package:skillswap/features/posts/data/repositories/posts_repository.dart';
 import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
+import 'package:skillswap/features/tags/presentation/providers/tags_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
 class EditPostScreen extends ConsumerStatefulWidget {

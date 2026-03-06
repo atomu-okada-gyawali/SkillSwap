@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/posts/data/models/post_model.dart';
-import 'package:skillswap/features/posts/data/models/tag_model.dart';
 import 'package:skillswap/features/posts/data/repositories/posts_repository.dart';
 
 final postsProvider = AsyncNotifierProvider<PostsNotifier, List<PostModel>>(() {
@@ -94,31 +93,6 @@ class MyPostsNotifier extends AsyncNotifier<List<PostModel>> {
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _fetchMyPosts());
-  }
-}
-
-final tagsProvider = AsyncNotifierProvider<TagsNotifier, List<TagModel>>(() {
-  return TagsNotifier();
-});
-
-class TagsNotifier extends AsyncNotifier<List<TagModel>> {
-  @override
-  Future<List<TagModel>> build() async {
-    return _fetchTags();
-  }
-
-  Future<List<TagModel>> _fetchTags() async {
-    final repository = ref.read(postsRepositoryProvider);
-    final result = await repository.getTags();
-    return result.fold(
-      (failure) => throw Exception(failure.message),
-      (tags) => tags,
-    );
-  }
-
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _fetchTags());
   }
 }
 

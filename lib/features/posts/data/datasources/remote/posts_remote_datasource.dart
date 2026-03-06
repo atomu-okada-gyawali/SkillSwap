@@ -6,7 +6,6 @@ import 'package:skillswap/core/api/api_client.dart';
 import 'package:skillswap/core/api/api_endpoints.dart';
 import 'package:skillswap/core/services/storage/token_service.dart';
 import 'package:skillswap/features/posts/data/models/post_model.dart';
-import 'package:skillswap/features/posts/data/models/tag_model.dart';
 
 final postsRemoteDatasourceProvider = Provider<PostsRemoteDatasource>((ref) {
   return PostsRemoteDatasource(
@@ -163,20 +162,5 @@ class PostsRemoteDatasource {
       return PostModel.fromJson(data);
     }
     throw Exception(response.data['message'] ?? 'Failed to create post');
-  }
-
-  Future<List<TagModel>> getTags() async {
-    final token = await _tokenService.getToken();
-    final response = await _apiClient.get(
-      ApiEndpoints.tags,
-      options: token != null
-          ? Options(headers: {'Authorization': 'Bearer $token'})
-          : null,
-    );
-    if (response.data['success'] == true) {
-      final data = response.data['data'] as List<dynamic>;
-      return data.map((json) => TagModel.fromJson(json)).toList();
-    }
-    throw Exception(response.data['message'] ?? 'Failed to fetch tags');
   }
 }
