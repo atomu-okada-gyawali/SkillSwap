@@ -170,7 +170,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   : (serverImageName != null &&
                                         serverImageName.isNotEmpty)
                                   ? NetworkImage(
-                                      '${ApiEndpoints.baseUrl}auth/profile-image/$serverImageName',
+                                      '${ApiEndpoints.baseUrl}$serverImageName',
                                     )
                                   : AssetImage(
                                       'assets/images/default-profile.jpg',

@@ -11,7 +11,7 @@ class ProposalScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final proposalsAsync = ref.watch(proposalsViewModelProvider);
+    // final proposalsAsync = ref.watch(proposalsViewModelProvider);
     final authState = ref.watch(authViewModelProvider);
     final currentUserId = authState.authEntity?.authId;
 
@@ -32,43 +32,43 @@ class ProposalScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            Expanded(
-              child: proposalsAsync.when(
-                data: (proposals) {
-                  final sentProposals = proposals
-                      .where((p) => p.senderId == currentUserId)
-                      .toList();
-                  final receivedProposals = proposals
-                      .where((p) => p.receiverId == currentUserId)
-                      .toList();
+            // Expanded(
+            //   child: proposalsAsync.when(
+            //     data: (proposals) {
+            //       final sentProposals = proposals
+            //           .where((p) => p.senderId == currentUserId)
+            //           .toList();
+            //       final receivedProposals = proposals
+            //           .where((p) => p.receiverId == currentUserId)
+            //           .toList();
 
-                  return TabBarView(
-                    children: [
-                      _buildProposalList(context, sentProposals, 'sent'),
-                      _buildProposalList(
-                        context,
-                        receivedProposals,
-                        'received',
-                      ),
-                    ],
-                  );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Error: $error'),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => ref.refresh(proposalsViewModelProvider),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            //       return TabBarView(
+            //         children: [
+            //           _buildProposalList(context, sentProposals, 'sent'),
+            //           _buildProposalList(
+            //             context,
+            //             receivedProposals,
+            //             'received',
+            //           ),
+            //         ],
+            //       );
+            //     },
+            //     loading: () => const Center(child: CircularProgressIndicator()),
+            //     error: (error, stack) => Center(
+            //       child: Column(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           Text('Error: $error'),
+            //           const SizedBox(height: 16),
+            //           // ElevatedButton(
+            //           //   onPressed: () => ref.refresh(proposalsViewModelProvider),
+            //           //   child: const Text('Retry'),
+            //           // ),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -119,15 +119,15 @@ class _ProposalCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  ProposalDetailScreen(proposalId: proposal.id!),
-            ),
-          );
-        },
+        // onTap: () {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) =>
+        //           ProposalDetailScreen(proposalId: proposal.id!),
+        //     ),
+        //   );
+        // },
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

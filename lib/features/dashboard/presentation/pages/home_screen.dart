@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/features/dashboard/presentation/pages/bottom_screen/explore_screen.dart';
+import 'package:skillswap/features/posts/presentation/pages/explore_screen.dart';
 import 'package:skillswap/features/dashboard/presentation/pages/bottom_screen/message_screen.dart';
 import 'package:skillswap/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
 import 'package:skillswap/features/dashboard/presentation/pages/bottom_screen/proposal_screen.dart';

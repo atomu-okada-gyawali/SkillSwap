@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:skillswap/core/api/api_endpoints.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
-import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
+import 'package:skillswap/features/posts/presentation/view_model/posts_provider.dart';
 import 'package:skillswap/features/posts/presentation/pages/edit_post_screen.dart';
 import 'package:skillswap/features/proposals/presentation/pages/send_proposal_screen.dart';
 import 'package:skillswap/features/tags/presentation/providers/tags_provider.dart';
@@ -75,7 +76,7 @@ class PostDetailScreen extends ConsumerWidget {
                   height: 250,
                   color: Colors.grey[200],
                   child: CachedNetworkImage(
-                    imageUrl: post.postPhoto!,
+                    imageUrl: '${ApiEndpoints.baseUrl}${post.postPhoto}',
                     fit: BoxFit.cover,
                     placeholder: (context, url) =>
                         const Center(child: CircularProgressIndicator()),
@@ -106,7 +107,21 @@ class PostDetailScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const CircleAvatar(),
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundImage:
+                              post.user?.profilePicture != null &&
+                                  post.user!.profilePicture!.isNotEmpty
+                              ? CachedNetworkImageProvider(
+                                  '${ApiEndpoints.baseUrl}${post.user!.profilePicture!}',
+                                )
+                              : null,
+                          child:
+                              post.user?.profilePicture == null ||
+                                  post.user!.profilePicture!.isEmpty
+                              ? const Icon(Icons.person, size: 24)
+                              : null,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           post.user?.username ?? 'Unknown',
@@ -162,7 +177,7 @@ class PostDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                     ],
-                    if (post.tag.isNotEmpty) ...[
+                    if (post.tag != null) ...[
                       const Text(
                         'Tags',
                         style: TextStyle(
@@ -174,14 +189,12 @@ class PostDetailScreen extends ConsumerWidget {
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: post.tag
-                            .map(
-                              (tagId) => Chip(
-                                label: Text(tagMap[tagId] ?? tagId),
-                                backgroundColor: MyColors.color2,
-                              ),
-                            )
-                            .toList(),
+                        children: [
+                          Chip(
+                            label: Text(post.tag?.name ?? ''),
+                            backgroundColor: MyColors.color2,
+                          ),
+                        ],
                       ),
                     ],
                     const SizedBox(height: 24),
@@ -190,18 +203,18 @@ class PostDetailScreen extends ConsumerWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SendProposalScreen(
-                                  receiverId: post.userId!,
-                                  postId: post.id!,
-                                  receiverName:
-                                      post.user?.username ?? 'Unknown',
-                                  relatedPost: post,
-                                ),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => SendProposalScreen(
+                            //       receiverId: post.userId!,
+                            //       postId: post.id!,
+                            //       receiverName:
+                            //           post.user?.username ?? 'Unknown',
+                            //       relatedPost: post,
+                            //     ),
+                            //   ),
+                            // );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: MyColors.color5,

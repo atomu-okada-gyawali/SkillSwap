@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:skillswap/features/posts/data/models/post_model.dart';
 import 'package:skillswap/features/posts/data/repositories/posts_repository.dart';
+import 'package:skillswap/features/posts/domain/entities/post_entity.dart';
 
 final postsProvider = AsyncNotifierProvider<PostsNotifier, List<PostModel>>(() {
   return PostsNotifier();
@@ -15,11 +17,12 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
   }
 
   Future<List<PostModel>> _fetchPosts() async {
+    final userId = ref.read(authViewModelProvider).authEntity?.authId ?? '';
     final repository = ref.read(postsRepositoryProvider);
-    final result = await repository.getPosts();
+    final result = await repository.getAllPosts(userId);
     return result.fold(
       (failure) => throw Exception(failure.message),
-      (posts) => posts,
+      (posts) => posts.map((e) => PostModel.fromEntity(e)).toList(),
     );
   }
 
@@ -32,7 +35,7 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
     required String title,
     required String description,
     required List<String> requirements,
-    required List<String> tags,
+    required String? tag,
     required String locationType,
     required String availability,
     String? duration,
@@ -40,19 +43,22 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
   }) async {
     final repository = ref.read(postsRepositoryProvider);
 
-    final result = await repository.createPostWithImage(
+    final postEntity = PostEntity(
       title: title,
       description: description,
       requirements: requirements,
-      tags: tags,
+      tag: tag ?? '',
       locationType: locationType,
       availability: availability,
       duration: duration,
-      image: image,
     );
 
-    result.fold((failure) => throw Exception(failure.message), (post) {
-      state = AsyncValue.data([...state.value ?? [], post]);
+    final result = await repository.createPost(postEntity);
+
+    result.fold((failure) => throw Exception(failure.message), (success) {
+      if (success) {
+        refresh();
+      }
     });
   }
 
@@ -82,11 +88,12 @@ class MyPostsNotifier extends AsyncNotifier<List<PostModel>> {
   }
 
   Future<List<PostModel>> _fetchMyPosts() async {
+    final userId = ref.read(authViewModelProvider).authEntity?.authId ?? '';
     final repository = ref.read(postsRepositoryProvider);
-    final result = await repository.getMyPosts();
+    final result = await repository.getPostByUser(userId);
     return result.fold(
       (failure) => throw Exception(failure.message),
-      (posts) => posts,
+      (posts) => posts.map((e) => PostModel.fromEntity(e)).toList(),
     );
   }
 
@@ -104,6 +111,6 @@ final selectedPostProvider = FutureProvider.family<PostModel, String>((
   final result = await repository.getPostById(id);
   return result.fold(
     (failure) => throw Exception(failure.message),
-    (post) => post,
+    (post) => PostModel.fromEntity(post),
   );
 });

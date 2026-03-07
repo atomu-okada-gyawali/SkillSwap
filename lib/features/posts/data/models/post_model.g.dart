@@ -8,7 +8,7 @@ part of 'post_model.dart';
 
 PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
       id: json['_id'] as String?,
-      userId: json['userId'] as String?,
+      userId: _userIdFromJson(json['userId']),
       title: json['title'] as String,
       description: json['description'] as String,
       postPhoto: json['postPhoto'] as String?,
@@ -16,8 +16,9 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
               ?.map((e) => e as String)
               .toList() ??
           const [],
-      tag: (json['tag'] as List<dynamic>?)?.map((e) => e as String).toList() ??
-          const [],
+      tag: json['tag'] == null
+          ? null
+          : TagModel.fromJson(json['tag'] as Map<String, dynamic>),
       locationType: json['locationType'] as String? ?? 'remote',
       availability: json['availability'] as String? ?? 'flexible',
       duration: json['duration'] as String?,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
-import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
+import 'package:skillswap/features/posts/presentation/view_model/posts_provider.dart';
 import 'package:skillswap/features/tags/presentation/providers/tags_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -25,7 +25,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   String _locationType = 'remote';
   String _availability = 'flexible';
   List<String> _requirements = [];
-  List<String> _selectedTags = [];
+  String? _selectedTag;
   File? _selectedImage;
   bool _isLoading = false;
 
@@ -86,13 +86,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             title: _titleController.text.trim(),
             description: _descriptionController.text.trim(),
             requirements: _requirements,
-            tags: _selectedTags,
+            tag: _selectedTag,
             locationType: _locationType,
             availability: _availability,
             duration: _durationController.text.trim().isEmpty
                 ? null
                 : _durationController.text.trim(),
-            image: _selectedImage,
           );
 
       if (mounted) {
@@ -291,17 +290,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   spacing: 8,
                   runSpacing: 8,
                   children: tags.map((tag) {
-                    final isSelected = _selectedTags.contains(tag.id);
+                    final isSelected = _selectedTag == tag.name;
                     return FilterChip(
                       label: Text(tag.name),
                       selected: isSelected,
                       onSelected: (selected) {
                         setState(() {
-                          if (selected) {
-                            _selectedTags.add(tag.id!);
-                          } else {
-                            _selectedTags.remove(tag.id);
-                          }
+                          _selectedTag = selected ? tag.name : null;
                         });
                       },
                     );

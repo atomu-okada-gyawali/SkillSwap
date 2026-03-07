@@ -5,17 +5,19 @@ import 'package:skillswap/utils/my_colors.dart';
 class PostCard extends StatelessWidget {
   final String title;
   final String author;
-  final List<String> wantsToLearn;
+  final List<String> tag;
   final String imagePath;
   final String? postId;
+  final String? userProfilePicture;
   final VoidCallback? onTap;
   const PostCard({
     super.key,
     this.title = "",
     this.author = "",
-    this.wantsToLearn = const [],
+    this.tag = const [],
     this.imagePath = "",
     this.postId,
+    this.userProfilePicture,
     this.onTap,
   });
 
@@ -46,7 +48,7 @@ class PostCard extends StatelessWidget {
                 child: SizedBox(
                   width: 131,
                   height: 141,
-                  child: imagePath.startsWith('http')
+                  child: imagePath.isNotEmpty && imagePath.startsWith('http')
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
                           child: CachedNetworkImage(
@@ -64,12 +66,31 @@ class PostCard extends StatelessWidget {
                             ),
                           ),
                         )
-                      : Image.asset(imagePath, fit: BoxFit.cover),
+                      : imagePath.isNotEmpty
+                      ? Image.asset(imagePath, fit: BoxFit.cover)
+                      : Container(
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.image, color: Colors.grey),
+                        ),
                 ),
               ),
               Row(
                 children: [
-                  const CircleAvatar(),
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundImage:
+                        userProfilePicture != null &&
+                            userProfilePicture!.isNotEmpty &&
+                            userProfilePicture!.startsWith('http')
+                        ? CachedNetworkImageProvider(userProfilePicture!)
+                        : null,
+                    child:
+                        userProfilePicture == null ||
+                            userProfilePicture!.isEmpty ||
+                            !userProfilePicture!.startsWith('http')
+                        ? const Icon(Icons.person, size: 20)
+                        : null,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -94,7 +115,7 @@ class PostCard extends StatelessWidget {
                           runSpacing: 2.0,
                           spacing: 2.0,
                           children: [
-                            for (var item in wantsToLearn)
+                            for (var item in tag)
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6.0,

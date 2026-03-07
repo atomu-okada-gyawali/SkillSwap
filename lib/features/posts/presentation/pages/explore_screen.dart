@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skillswap/features/dashboard/presentation/widgets/post_card.dart';
-import 'package:skillswap/features/dashboard/presentation/widgets/tag.dart';
-import 'package:skillswap/features/dashboard/presentation/widgets/welcome_card.dart';
+import 'package:skillswap/core/api/api_endpoints.dart';
+import 'package:skillswap/features/posts/presentation/widgets/post_card.dart';
+import 'package:skillswap/features/posts/presentation/widgets/tag.dart';
+import 'package:skillswap/features/posts/presentation/widgets/welcome_card.dart';
 import 'package:skillswap/features/posts/presentation/pages/post_detail_screen.dart';
-import 'package:skillswap/features/posts/presentation/providers/posts_provider.dart';
+import 'package:skillswap/features/posts/presentation/view_model/posts_provider.dart';
 import 'package:skillswap/features/tags/presentation/providers/tags_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -64,14 +65,19 @@ class ExploreScreen extends ConsumerWidget {
                   itemCount: posts.length,
                   itemBuilder: (BuildContext context, int index) {
                     final post = posts[index];
-                    final tagNames = post.tag
-                        .map((tagId) => tagMap[tagId] ?? tagId)
-                        .toList();
                     return PostCard(
                       title: post.title,
                       author: post.user?.username ?? 'Unknown',
-                      wantsToLearn: tagNames,
-                      imagePath: post.postPhoto ?? '',
+                      tag: post.tag != null ? [post.tag!.name] : [],
+                      imagePath:
+                          post.postPhoto != null && post.postPhoto!.isNotEmpty
+                          ? '${ApiEndpoints.baseUrl}${post.postPhoto}'
+                          : '',
+                      userProfilePicture:
+                          post.user?.profilePicture != null &&
+                              post.user!.profilePicture!.isNotEmpty
+                          ? '${ApiEndpoints.baseUrl}${post.user!.profilePicture}'
+                          : null,
                       postId: post.id,
                       onTap: () {
                         if (post.id != null) {
