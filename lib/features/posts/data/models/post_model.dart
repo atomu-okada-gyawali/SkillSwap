@@ -15,6 +15,19 @@ String? _userIdFromJson(dynamic json) {
   return null;
 }
 
+/// Custom converter to extract user object from nested userId field
+AuthApiModel? _userFromUserIdJson(dynamic json) {
+  if (json is Map<String, dynamic>) {
+    try {
+      return AuthApiModel.fromJson(json);
+    } catch (e) {
+      print('DEBUG: Failed to parse user from userId object: $e');
+      return null;
+    }
+  }
+  return null;
+}
+
 @JsonSerializable()
 class PostModel {
   @JsonKey(name: '_id')
@@ -53,16 +66,18 @@ class PostModel {
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
-    // First, try to get the generated model
+    // Backend populates userId as a nested object: { _id, username, fullName, profilePicture }
+    // First, parse using generated method
     final model = _$PostModelFromJson(json);
 
-    // If user is null but userId is a Map (embedded user), parse it
-    if (model.user == null && json['userId'] is Map<String, dynamic>) {
+    // Extract user data from nested userId object
+    if (json['userId'] is Map<String, dynamic>) {
       try {
         final userObject = AuthApiModel.fromJson(
           json['userId'] as Map<String, dynamic>,
         );
-        // Return a new instance with the user populated
+        print('DEBUG: ✓ Extracted user from userId: ${userObject.username}');
+
         return PostModel(
           id: model.id,
           userId: model.userId,
@@ -79,8 +94,7 @@ class PostModel {
           user: userObject,
         );
       } catch (e) {
-        // If parsing fails, return the original model
-        return model;
+        print('DEBUG: ✗ Failed to parse user from userId: $e');
       }
     }
 
@@ -101,7 +115,9 @@ class PostModel {
       duration: duration,
       createdAt: createdAt,
       updatedAt: updatedAt,
-      user: user?.username,
+      userId: userId,
+      username: user?.username,
+      userProfilePicture: user?.profilePicture,
     );
   }
 
@@ -112,7 +128,9 @@ class PostModel {
       description: entity.description,
       postPhoto: entity.postPhoto,
       requirements: entity.requirements,
-      tag: entity.tag.isNotEmpty ? TagModel(name: entity.tag) : null,
+      tag: entity.tag?.isNotEmpty == true
+          ? TagModel(id: entity.tag!, name: '')
+          : null,
       locationType: entity.locationType,
       availability: entity.availability,
       duration: entity.duration,

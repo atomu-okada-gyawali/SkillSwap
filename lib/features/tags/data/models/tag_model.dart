@@ -4,6 +4,7 @@ part 'tag_model.g.dart';
 
 @JsonSerializable()
 class TagModel {
+  @JsonKey(name: '_id')
   final String? id;
   final String name;
   @JsonKey(name: 'tagImage')

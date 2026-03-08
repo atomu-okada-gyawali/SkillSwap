@@ -115,7 +115,7 @@ class ProfileRepository implements IProfileRepository {
 
       final fileName = image.path.split('/').last;
       final formData = FormData.fromMap({
-        'profilePicture': await MultipartFile.fromFileSync(
+        'profilePicture': MultipartFile.fromFileSync(
           image.path,
           filename: fileName,
         ),

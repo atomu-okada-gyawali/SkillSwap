@@ -60,7 +60,6 @@ class AuthApiModel {
     );
   }
 
-  // fromEntity
   factory AuthApiModel.fromEntity(AuthEntity entity) {
     return AuthApiModel(
       fullName: entity.fullName,

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
-import 'package:skillswap/features/posts/presentation/view_model/posts_provider.dart';
+import 'package:skillswap/features/posts/presentation/view_model/posts_viewmodel.dart';
+import 'package:skillswap/features/tags/domain/entities/tag.dart';
 import 'package:skillswap/features/tags/presentation/providers/tags_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -24,12 +25,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   String _locationType = 'remote';
   String _availability = 'flexible';
-  List<String> _requirements = [];
-  String? _selectedTag;
+  final List<String> _requirements = [];
+  Tag? _selectedTag;
   File? _selectedImage;
   bool _isLoading = false;
 
-  final List<String> _locationTypes = ['remote', 'onsite', 'hybrid'];
+  final List<String> _locationTypes = ['remote', 'on-site', 'hybrid'];
   final List<String> _availabilityTypes = [
     'full-time',
     'part-time',
@@ -48,12 +49,47 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
+
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile = await picker.pickImage(
+                  source: ImageSource.gallery,
+                );
+                if (pickedFile != null) {
+                  setState(() {
+                    _selectedImage = File(pickedFile.path);
+                  });
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take a Photo'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile = await picker.pickImage(
+                  source: ImageSource.camera,
+                );
+                if (pickedFile != null) {
+                  setState(() {
+                    _selectedImage = File(pickedFile.path);
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _addRequirement() {
@@ -75,28 +111,27 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Future<void> _createPost() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       await ref
-          .read(postsProvider.notifier)
+          .read(postsViewModelProvider.notifier)
           .createPost(
             title: _titleController.text.trim(),
             description: _descriptionController.text.trim(),
             requirements: _requirements,
-            tag: _selectedTag,
+            tag: _selectedTag?.id,
             locationType: _locationType,
             availability: _availability,
             duration: _durationController.text.trim().isEmpty
                 ? null
                 : _durationController.text.trim(),
+            image: _selectedImage,
           );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Post created successfully!')),
+          const SnackBar(content: Text('Post created successfully')),
         );
         Navigator.pop(context);
       }
@@ -104,14 +139,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('Error creating post: $e')));
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      setState(() => _isLoading = false);
     }
   }
 
@@ -205,9 +236,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     .toList(),
                 onChanged: (value) {
                   if (value != null) {
-                    setState(() {
-                      _locationType = value;
-                    });
+                    setState(() => _locationType = value);
                   }
                 },
               ),
@@ -226,9 +255,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     .toList(),
                 onChanged: (value) {
                   if (value != null) {
-                    setState(() {
-                      _availability = value;
-                    });
+                    setState(() => _availability = value);
                   }
                 },
               ),
@@ -290,13 +317,14 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   spacing: 8,
                   runSpacing: 8,
                   children: tags.map((tag) {
-                    final isSelected = _selectedTag == tag.name;
+                    final isSelected =
+                        _selectedTag != null && _selectedTag!.name == tag.name;
                     return FilterChip(
                       label: Text(tag.name),
                       selected: isSelected,
                       onSelected: (selected) {
                         setState(() {
-                          _selectedTag = selected ? tag.name : null;
+                          _selectedTag = selected ? tag : null;
                         });
                       },
                     );

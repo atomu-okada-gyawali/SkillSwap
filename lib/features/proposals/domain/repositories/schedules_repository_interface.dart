@@ -1,10 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:skillswap/core/constants/failures.dart';
-import 'package:skillswap/features/proposals/data/models/schedule_model.dart';
+import 'package:skillswap/features/proposals/domain/entities/schedule_entity.dart';
 
 abstract interface class ISchedulesRepository {
-  Future<Either<Failure, List<ScheduleModel>>> getSchedules();
-  Future<Either<Failure, ScheduleModel>> getScheduleById(String id);
-  Future<Either<Failure, ScheduleModel>> createSchedule(ScheduleModel schedule);
-  Future<Either<Failure, ScheduleModel>> acceptSchedule(String id);
+  Future<Either<Failure, List<ScheduleEntity>>> getSchedules();
+  Future<Either<Failure, ScheduleEntity>> getScheduleById(String id);
+  Future<Either<Failure, ScheduleEntity>> createSchedule(
+    ScheduleEntity schedule,
+  );
+  Future<Either<Failure, ScheduleEntity>> acceptSchedule(String id);
 }

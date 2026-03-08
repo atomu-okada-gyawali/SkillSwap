@@ -5,6 +5,7 @@ import 'package:skillswap/core/constants/failures.dart';
 import 'package:skillswap/core/services/connectivity/network_info.dart';
 import 'package:skillswap/features/proposals/data/datasources/remote/schedules_remote_datasource.dart';
 import 'package:skillswap/features/proposals/data/models/schedule_model.dart';
+import 'package:skillswap/features/proposals/domain/entities/schedule_entity.dart';
 import 'package:skillswap/features/proposals/domain/repositories/schedules_repository_interface.dart';
 
 final schedulesRepositoryProvider = Provider<ISchedulesRepository>((ref) {
@@ -27,11 +28,12 @@ class SchedulesRepository implements ISchedulesRepository {
        _networkInfo = networkInfo;
 
   @override
-  Future<Either<Failure, List<ScheduleModel>>> getSchedules() async {
+  Future<Either<Failure, List<ScheduleEntity>>> getSchedules() async {
     if (await _networkInfo.isConnected) {
       try {
         final schedules = await _schedulesRemoteDatasource.getSchedules();
-        return Right(schedules);
+        final entities = schedules.map((model) => model.toEntity()).toList();
+        return Right(entities);
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -48,11 +50,12 @@ class SchedulesRepository implements ISchedulesRepository {
   }
 
   @override
-  Future<Either<Failure, ScheduleModel>> getScheduleById(String id) async {
+  Future<Either<Failure, ScheduleEntity>> getScheduleById(String id) async {
     if (await _networkInfo.isConnected) {
       try {
         final schedule = await _schedulesRemoteDatasource.getScheduleById(id);
-        return Right(schedule);
+        final entity = schedule.toEntity();
+        return Right(entity);
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -69,15 +72,17 @@ class SchedulesRepository implements ISchedulesRepository {
   }
 
   @override
-  Future<Either<Failure, ScheduleModel>> createSchedule(
-    ScheduleModel schedule,
+  Future<Either<Failure, ScheduleEntity>> createSchedule(
+    ScheduleEntity schedule,
   ) async {
     if (await _networkInfo.isConnected) {
       try {
+        final model = ScheduleModel.fromEntity(schedule);
         final createdSchedule = await _schedulesRemoteDatasource.createSchedule(
-          schedule,
+          model,
         );
-        return Right(createdSchedule);
+        final entity = createdSchedule.toEntity();
+        return Right(entity);
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -94,11 +99,12 @@ class SchedulesRepository implements ISchedulesRepository {
   }
 
   @override
-  Future<Either<Failure, ScheduleModel>> acceptSchedule(String id) async {
+  Future<Either<Failure, ScheduleEntity>> acceptSchedule(String id) async {
     if (await _networkInfo.isConnected) {
       try {
         final schedule = await _schedulesRemoteDatasource.acceptSchedule(id);
-        return Right(schedule);
+        final entity = schedule.toEntity();
+        return Right(entity);
       } on DioException catch (e) {
         return Left(
           ApiFailure(

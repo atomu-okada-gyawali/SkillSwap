@@ -6,13 +6,17 @@ class PostEntity extends Equatable {
   final String description;
   final String? postPhoto;
   final List<String> requirements;
-  final String tag;
+  final String? tag;
   final String locationType;
   final String availability;
   final String? duration;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final String? user;
+
+  // user-related information populated from backend
+  final String? userId;
+  final String? username;
+  final String? userProfilePicture;
 
   const PostEntity({
     this.id,
@@ -20,13 +24,15 @@ class PostEntity extends Equatable {
     required this.description,
     this.postPhoto,
     required this.requirements,
-    required this.tag,
+    this.tag,
     required this.locationType,
     required this.availability,
     this.duration,
     this.createdAt,
     this.updatedAt,
-    this.user,
+    this.userId,
+    this.username,
+    this.userProfilePicture,
   });
 
   @override
@@ -42,6 +48,8 @@ class PostEntity extends Equatable {
     duration,
     createdAt,
     updatedAt,
-    user,
+    userId,
+    username,
+    userProfilePicture,
   ];
 }

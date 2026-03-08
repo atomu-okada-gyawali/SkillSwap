@@ -66,8 +66,6 @@ class PostCard extends StatelessWidget {
                             ),
                           ),
                         )
-                      : imagePath.isNotEmpty
-                      ? Image.asset(imagePath, fit: BoxFit.cover)
                       : Container(
                           color: Colors.grey[200],
                           child: const Icon(Icons.image, color: Colors.grey),

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/core/constants/failures.dart';
 import 'package:skillswap/core/usecases/app_usecase.dart';
 
-import 'package:skillswap/features/proposals/data/models/schedule_model.dart';
+import 'package:skillswap/features/proposals/domain/entities/schedule_entity.dart';
 import 'package:skillswap/features/proposals/data/repositories/schedules_repository.dart';
 import 'package:skillswap/features/proposals/domain/repositories/schedules_repository_interface.dart';
 
@@ -20,14 +20,16 @@ class AcceptScheduleParams {
 }
 
 class AcceptScheduleUsecase
-    implements UsecaseWithParams<ScheduleModel, AcceptScheduleParams> {
+    implements UsecaseWithParams<ScheduleEntity, AcceptScheduleParams> {
   final ISchedulesRepository _repository;
 
   AcceptScheduleUsecase({required ISchedulesRepository repository})
     : _repository = repository;
 
   @override
-  Future<Either<Failure, ScheduleModel>> call(AcceptScheduleParams params) async {
+  Future<Either<Failure, ScheduleEntity>> call(
+    AcceptScheduleParams params,
+  ) async {
     return await _repository.acceptSchedule(params.id);
   }
 }

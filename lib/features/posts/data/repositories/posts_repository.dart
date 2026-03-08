@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,7 +32,7 @@ class PostsRepository implements IPostsRepository {
   Future<Either<Failure, List<PostEntity>>> getAllPosts(String userId) async {
     if (await _networkInfo.isConnected) {
       try {
-        final posts = await _postsRemoteDatasource.getPosts();
+        final posts = await _postsRemoteDatasource.getPosts(userId);
         return Right(posts.map((model) => model.toEntity()).toList());
       } on DioException catch (e) {
         return Left(
@@ -92,11 +93,31 @@ class PostsRepository implements IPostsRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> createPost(PostEntity item) async {
+  Future<Either<Failure, bool>> createPost(
+    PostEntity item, {
+    File? image,
+  }) async {
     if (await _networkInfo.isConnected) {
       try {
         final model = PostModel.fromEntity(item);
-        await _postsRemoteDatasource.createPost(model);
+
+        if (image != null) {
+          // Use the image upload method
+          await _postsRemoteDatasource.createPostWithImage(
+            title: model.title,
+            description: model.description,
+            requirements: model.requirements,
+            tags: model.tag != null ? [model.tag!.id!] : [],
+            locationType: model.locationType,
+            availability: model.availability,
+            duration: model.duration,
+            image: image,
+          );
+        } else {
+          // Use the regular method
+          await _postsRemoteDatasource.createPost(model);
+        }
+
         return const Right(true);
       } on DioException catch (e) {
         return Left(
@@ -145,6 +166,27 @@ class PostsRepository implements IPostsRepository {
         return Left(
           ApiFailure(
             message: e.response?.data['message'] ?? 'Failed to delete post',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(ApiFailure(message: 'No internet connection'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PostEntity>>> getMyPosts() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final posts = await _postsRemoteDatasource.getMyPosts();
+        return Right(posts.map((model) => model.toEntity()).toList());
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Failed to fetch my posts',
             statusCode: e.response?.statusCode,
           ),
         );

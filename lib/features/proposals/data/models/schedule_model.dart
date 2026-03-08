@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:skillswap/features/proposals/domain/entities/schedule_entity.dart';
 
 part 'schedule_model.g.dart';
 
@@ -49,6 +50,32 @@ class ScheduleModel {
       accepted: accepted ?? this.accepted,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  factory ScheduleModel.fromEntity(ScheduleEntity entity) {
+    return ScheduleModel(
+      id: entity.id,
+      proposalId: entity.proposalId,
+      proposedDate: entity.proposedDate,
+      proposedTime: entity.proposedTime,
+      durationMinutes: entity.durationMinutes,
+      accepted: entity.accepted,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  ScheduleEntity toEntity() {
+    return ScheduleEntity(
+      id: id,
+      proposalId: proposalId,
+      proposedDate: proposedDate,
+      proposedTime: proposedTime,
+      durationMinutes: durationMinutes,
+      accepted: accepted,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/core/constants/failures.dart';
 import 'package:skillswap/core/usecases/app_usecase.dart';
 
-import 'package:skillswap/features/proposals/data/models/schedule_model.dart';
+import 'package:skillswap/features/proposals/domain/entities/schedule_entity.dart';
 import 'package:skillswap/features/proposals/data/repositories/schedules_repository.dart';
 import 'package:skillswap/features/proposals/domain/repositories/schedules_repository_interface.dart';
 
@@ -14,20 +14,22 @@ final createScheduleUsecaseProvider = Provider<CreateScheduleUsecase>((ref) {
 });
 
 class CreateScheduleParams {
-  final ScheduleModel schedule;
+  final ScheduleEntity schedule;
 
   CreateScheduleParams({required this.schedule});
 }
 
 class CreateScheduleUsecase
-    implements UsecaseWithParams<ScheduleModel, CreateScheduleParams> {
+    implements UsecaseWithParams<ScheduleEntity, CreateScheduleParams> {
   final ISchedulesRepository _repository;
 
   CreateScheduleUsecase({required ISchedulesRepository repository})
     : _repository = repository;
 
   @override
-  Future<Either<Failure, ScheduleModel>> call(CreateScheduleParams params) async {
+  Future<Either<Failure, ScheduleEntity>> call(
+    CreateScheduleParams params,
+  ) async {
     return await _repository.createSchedule(params.schedule);
   }
 }

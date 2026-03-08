@@ -173,4 +173,34 @@ class AuthRepository implements IAuthRepository {
       return const Left(ApiFailure(message: "No internet connection"));
     }
   }
+
+  @override
+  Future<Either<Failure, AuthEntity>> updateProfile(
+    String fullName,
+    String? profilePicture,
+    File? newProfileImage,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final updatedUserModel = await _authRemoteDataSource.updateProfile(
+          fullName,
+          profilePicture,
+          newProfileImage,
+        );
+        final updatedUserEntity = updatedUserModel.toEntity();
+        return Right(updatedUserEntity);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Update failed',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(ApiFailure(message: "No internet connection"));
+    }
+  }
 }

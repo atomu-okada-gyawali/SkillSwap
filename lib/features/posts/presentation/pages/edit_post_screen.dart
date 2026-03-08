@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skillswap/core/api/api_endpoints.dart';
 import 'package:skillswap/features/auth/presentation/widgets/custom_field_text.dart';
-import 'package:skillswap/features/posts/data/models/post_model.dart';
-import 'package:skillswap/features/posts/data/repositories/posts_repository.dart';
 import 'package:skillswap/features/posts/domain/entities/post_entity.dart';
-import 'package:skillswap/features/posts/presentation/view_model/posts_provider.dart';
+import 'package:skillswap/features/posts/presentation/view_model/posts_viewmodel.dart';
+import 'package:skillswap/features/posts/presentation/state/post_state.dart';
 import 'package:skillswap/features/tags/presentation/providers/tags_provider.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -36,13 +36,21 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
   bool _isLoading = false;
   bool _isInitialized = false;
 
-  final List<String> _locationTypes = ['remote', 'onsite', 'hybrid'];
+  final List<String> _locationTypes = ['remote', 'on-site', 'hybrid'];
   final List<String> _availabilityTypes = [
     'full-time',
     'part-time',
     'weekends',
     'flexible',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(postsViewModelProvider.notifier).getPostById(widget.postId);
+    });
+  }
 
   @override
   void dispose() {
@@ -53,7 +61,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
     super.dispose();
   }
 
-  void _initializeForm(PostModel post) {
+  void _initializeForm(PostEntity post) {
     if (_isInitialized) return;
     _isInitialized = true;
 
@@ -63,19 +71,55 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
     _locationType = post.locationType;
     _availability = post.availability;
     _requirements = List.from(post.requirements);
-    _selectedTag = post.tag?.name;
+    _selectedTag = post.tag;
     _existingImageUrl = post.postPhoto;
   }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-        _existingImageUrl = null;
-      });
-    }
+
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile = await picker.pickImage(
+                  source: ImageSource.gallery,
+                );
+                if (pickedFile != null) {
+                  setState(() {
+                    _selectedImage = File(pickedFile.path);
+                    _existingImageUrl = null;
+                  });
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take a Photo'),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFile = await picker.pickImage(
+                  source: ImageSource.camera,
+                );
+                if (pickedFile != null) {
+                  setState(() {
+                    _selectedImage = File(pickedFile.path);
+                    _existingImageUrl = null;
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _addRequirement() {
@@ -97,92 +141,100 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
   Future<void> _updatePost() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
-      final postEntity = PostEntity(
-        id: widget.postId,
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        requirements: _requirements,
-        tag: _selectedTag ?? '',
-        locationType: _locationType,
-        availability: _availability,
-        duration: _durationController.text.trim().isEmpty
-            ? null
-            : _durationController.text.trim(),
-      );
+      final tagsAsync = ref.read(tagsProvider);
+      String? tagId;
+      if (_selectedTag != null) {
+        final tags = tagsAsync.valueOrNull ?? [];
+        final selectedTagObj = tags
+            .where((t) => t.name == _selectedTag)
+            .firstOrNull;
+        tagId = selectedTagObj?.id;
+      }
 
-      final repository = ref.read(postsRepositoryProvider);
-      final result = await repository.updatePost(postEntity);
+      await ref
+          .read(postsViewModelProvider.notifier)
+          .updatePost(
+            postId: widget.postId,
+            title: _titleController.text.trim(),
+            description: _descriptionController.text.trim(),
+            requirements: _requirements,
+            tag: tagId,
+            locationType: _locationType,
+            availability: _availability,
+            duration: _durationController.text.trim().isEmpty
+                ? null
+                : _durationController.text.trim(),
+          );
 
-      result.fold(
-        (failure) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${failure.message}')),
-            );
-          }
-        },
-        (updatedPost) {
-          ref.invalidate(selectedPostProvider(widget.postId));
-          ref.invalidate(postsProvider);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Post updated successfully!')),
-            );
-            Navigator.pop(context);
-          }
-        },
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Post updated successfully')),
+        );
+        Navigator.pop(context);
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('Error updating post: $e')));
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final postAsync = ref.watch(selectedPostProvider(widget.postId));
+    final postsState = ref.watch(postsViewModelProvider);
     final tagsAsync = ref.watch(tagsProvider);
+
+    final selectedPost = postsState.selectedPost;
+
+    if (postsState.status == PostStatus.loading && selectedPost == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Edit Post'),
+          backgroundColor: MyColors.color4,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (selectedPost == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Edit Post'),
+          backgroundColor: MyColors.color4,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: ${postsState.errorMessage ?? 'Post not found'}'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => ref
+                    .read(postsViewModelProvider.notifier)
+                    .getPostById(widget.postId),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    _initializeForm(selectedPost);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Post'),
         backgroundColor: MyColors.color4,
       ),
-      body: postAsync.when(
-        data: (post) {
-          _initializeForm(post);
-          return _buildForm(tagsAsync);
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: $error'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () =>
-                    ref.refresh(selectedPostProvider(widget.postId)),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: _buildForm(tagsAsync),
     );
   }
 
@@ -213,7 +265,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(
-                          _existingImageUrl!,
+                          '${ApiEndpoints.baseUrl}${_existingImageUrl}',
                           fit: BoxFit.cover,
                         ),
                       )
@@ -269,7 +321,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
                 border: OutlineInputBorder(),
               ),
               items: _locationTypes
-                  .map(
+                  .map<DropdownMenuItem<String>>(
                     (type) => DropdownMenuItem(value: type, child: Text(type)),
                   )
                   .toList(),
@@ -289,7 +341,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
                 border: OutlineInputBorder(),
               ),
               items: _availabilityTypes
-                  .map(
+                  .map<DropdownMenuItem<String>>(
                     (type) => DropdownMenuItem(value: type, child: Text(type)),
                   )
                   .toList(),
@@ -340,7 +392,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
               spacing: 8,
               runSpacing: 8,
               children: _requirements
-                  .map(
+                  .map<Widget>(
                     (req) => Chip(
                       label: Text(req),
                       onDeleted: () => _removeRequirement(req),
@@ -355,22 +407,26 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
             ),
             const SizedBox(height: 8),
             tagsAsync.when(
-              data: (tags) => Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: tags.map((tag) {
-                  final isSelected = _selectedTag == tag.name;
-                  return FilterChip(
-                    label: Text(tag.name),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedTag = selected ? tag.name : null;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
+              data: (tags) {
+                final selectedTagName = _selectedTag;
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: tags.map<Widget>((tag) {
+                    final isSelected =
+                        selectedTagName != null && tag.name == selectedTagName;
+                    return FilterChip(
+                      label: Text(tag.name),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedTag = selected ? tag.name : null;
+                        });
+                      },
+                    );
+                  }).toList(),
+                );
+              },
               loading: () => const CircularProgressIndicator(),
               error: (error, stack) => Text('Error loading tags: $error'),
             ),

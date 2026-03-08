@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skillswap/features/auth/data/repositories/auth_repository.dart';
 import 'package:skillswap/features/auth/domain/usecases/login_usecase.dart';
 import 'package:skillswap/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:skillswap/features/auth/domain/usecases/register_usecase.dart';
@@ -16,12 +17,15 @@ class AuthViewModel extends Notifier<AuthState> {
   late final LoginUsecase _loginUsecase;
   late final UploadPhotoUsecase _uploadPhotoUsecase;
   late final LogoutUsecase _logoutUsecase;
+  late final AuthRepository _authRepository;
+
   @override
   AuthState build() {
     _registerUsecase = ref.read(registerUsecaseProvider);
     _loginUsecase = ref.read(loginUsecaseProvider);
     _uploadPhotoUsecase = ref.read(uploadPhotoUsecaseProvider);
     _logoutUsecase = ref.read(logoutUsecaseProvider);
+    _authRepository = ref.read(authRepositoryProvider);
     return AuthState();
   }
 
@@ -102,5 +106,34 @@ class AuthViewModel extends Notifier<AuthState> {
   Future<void> logout() async {
     await _logoutUsecase(null);
     state = AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  Future<void> updateProfile({
+    required String fullName,
+    String? profilePicture,
+    File? newProfileImage,
+  }) async {
+    state = state.copywith(status: AuthStatus.loading);
+
+    final result = await _authRepository.updateProfile(
+      fullName,
+      profilePicture,
+      newProfileImage,
+    );
+
+    result.fold(
+      (failure) {
+        state = state.copywith(
+          status: AuthStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (updatedUser) {
+        state = AuthState(
+          status: AuthStatus.authenticated,
+          authEntity: updatedUser,
+        );
+      },
+    );
   }
 }

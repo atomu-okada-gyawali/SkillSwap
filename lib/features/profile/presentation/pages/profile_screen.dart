@@ -1,14 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:skillswap/features/profile/presentation/pages/edit_profile_screen.dart';
+import 'package:skillswap/features/posts/presentation/pages/my_posts_screen.dart';
 import 'package:skillswap/utils/my_colors.dart';
 import 'package:skillswap/core/api/api_endpoints.dart';
 import 'package:skillswap/core/services/storage/user_session_service.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -18,118 +15,6 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  final List<XFile> _selectedMedia = [];
-  final ImagePicker _imagePicker = ImagePicker();
-  String? _selectedMediaType;
-
-  Future<bool> _requestPermission(Permission permission) async {
-    final status = await permission.status;
-    if (status.isGranted) {
-      return true;
-    }
-    if (status.isDenied) {
-      final result = await permission.request();
-      return result.isGranted;
-    }
-    if (status.isPermanentlyDenied) {
-      _showPermissionDialog();
-      return false;
-    }
-    return false;
-  }
-
-  void _showPermissionDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Permission Denied"),
-        content: Text("Please grant the necessary permissions from settings."),
-        actions: [
-          TextButton(onPressed: () {}, child: Text('Cancel')),
-          TextButton(onPressed: () {}, child: Text('Open Settings')),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _pickFromCamera() async {
-    final hasPermission = await _requestPermission(Permission.camera);
-    if (!hasPermission) return;
-
-    final XFile? photo = await _imagePicker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 80,
-    );
-
-    if (photo != null) {
-      setState(() {
-        _selectedMedia.clear();
-        _selectedMedia.add(XFile(photo.path));
-        _selectedMediaType = 'photo';
-      });
-      //upload image to server
-      await ref
-          .read(authViewModelProvider.notifier)
-          .uploadProfilePicture(photo: File(photo.path));
-    }
-  }
-
-  Future<void> _pickFromGallery() async {
-    try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-
-      if (image != null) {
-        setState(() {
-          _selectedMedia.clear();
-          _selectedMedia.add(XFile(image.path));
-          _selectedMediaType = 'photo';
-        });
-        //upload image to server
-        await ref
-            .read(authViewModelProvider.notifier)
-            .uploadProfilePicture(photo: File(image.path));
-      }
-    } catch (e) {
-      debugPrint('Gallery Error $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error occurred while picking from gallery.')),
-        );
-      }
-    }
-  }
-
-  Future<void> _pickMedia() async {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text('Take Photo'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _pickFromCamera();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Choose from Gallery'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _pickFromGallery();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authViewModelProvider);
@@ -164,11 +49,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             CircleAvatar(
                               foregroundColor: MyColors.color1,
                               radius: 45,
-                              foregroundImage: _selectedMedia.isNotEmpty
-                                  ? FileImage(File(_selectedMedia[0].path))
-                                        as ImageProvider
-                                  : (serverImageName != null &&
-                                        serverImageName.isNotEmpty)
+                              foregroundImage:
+                                  (serverImageName != null &&
+                                      serverImageName.isNotEmpty)
                                   ? NetworkImage(
                                       '${ApiEndpoints.baseUrl}$serverImageName',
                                     )
@@ -182,7 +65,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               right: 0,
                               child: Center(
                                 child: GestureDetector(
-                                  onTap: () => {_pickMedia()},
+                                  onTap: () {
+                                    final user = ref
+                                        .read(authViewModelProvider)
+                                        .authEntity;
+                                    if (user != null) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              EditProfileScreen(user: user),
+                                        ),
+                                      );
+                                    }
+                                  },
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(40),
@@ -262,24 +158,73 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         icon: Icons.person,
                         text: '@${user?.username ?? 'unknown'}',
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const EditProfileScreen(),
-                            ),
-                          );
-                        },
-                        child: MyBox(
-                          icon: Icons.edit,
-                          text: "Edit Profile",
-                          color: MyColors.color1,
-                        ),
-                      ),
                     ],
                   ),
                   Expanded(child: SizedBox()),
+
+                  // My Posts Section
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: MyColors.color5.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: MyColors.color5.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'My Posts',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: MyColors.color1,
+                              ),
+                            ),
+                            TextButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const MyPostsScreen(),
+                                  ),
+                                );
+                              },
+                              icon: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 16,
+                                color: MyColors.color1,
+                              ),
+                              label: Text(
+                                'View All',
+                                style: TextStyle(
+                                  color: MyColors.color1,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Manage and edit your skill posts',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
                   MyBox(
                     icon: Icons.logout,
                     text: "Logout",

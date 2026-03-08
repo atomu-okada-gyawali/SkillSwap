@@ -24,10 +24,19 @@ class ProposalsRemoteDatasource {
   }) : _apiClient = apiClient,
        _tokenService = tokenService;
 
-  Future<List<ProposalModel>> getProposals() async {
+  Future<List<ProposalModel>> getProposals({
+    required String userId,
+    int page = 1,
+    int size = 10,
+  }) async {
     final token = await _tokenService.getToken();
     final response = await _apiClient.get(
       ApiEndpoints.proposals,
+      queryParameters: {
+        'userId': userId,
+        'page': page.toString(),
+        'size': size.toString(),
+      },
       options: token != null
           ? Options(headers: {'Authorization': 'Bearer $token'})
           : null,
@@ -54,11 +63,27 @@ class ProposalsRemoteDatasource {
     throw Exception(response.data['message'] ?? 'Failed to fetch proposal');
   }
 
-  Future<ProposalModel> createProposal(ProposalModel proposal) async {
+  Future<ProposalModel> submitCompleteProposal({
+    required String receiverId,
+    required String postId,
+    required String offeredSkill,
+    required String message,
+    required String proposedDate,
+    required String proposedTime,
+    required int durationMinutes,
+  }) async {
     final token = await _tokenService.getToken();
     final response = await _apiClient.post(
-      ApiEndpoints.proposals,
-      data: proposal.toJson(),
+      ApiEndpoints.createProposal(),
+      data: {
+        'receiverId': receiverId,
+        'postId': postId,
+        'offeredSkill': offeredSkill,
+        'message': message,
+        'proposedDate': proposedDate,
+        'proposedTime': proposedTime,
+        'durationMinutes': durationMinutes,
+      },
       options: token != null
           ? Options(headers: {'Authorization': 'Bearer $token'})
           : null,
@@ -86,5 +111,18 @@ class ProposalsRemoteDatasource {
     throw Exception(
       response.data['message'] ?? 'Failed to update proposal status',
     );
+  }
+
+  Future<void> deleteProposal(String id) async {
+    final token = await _tokenService.getToken();
+    final response = await _apiClient.delete(
+      ApiEndpoints.proposalById(id),
+      options: token != null
+          ? Options(headers: {'Authorization': 'Bearer $token'})
+          : null,
+    );
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Failed to delete proposal');
+    }
   }
 }
