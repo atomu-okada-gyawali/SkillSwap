@@ -42,11 +42,14 @@ class ProposalsRepository implements IProposalsRepository {
         final entities = models.map((model) => model.toEntity()).toList();
         return Right(entities);
       } on DioException catch (e) {
+        String errorMessage = 'Failed to fetch proposals';
+        if (e.response?.data is Map<String, dynamic>) {
+          errorMessage = e.response?.data['message'] ?? errorMessage;
+        } else if (e.response?.data is String) {
+          errorMessage = e.response?.data as String;
+        }
         return Left(
-          ApiFailure(
-            message: e.response?.data['message'] ?? 'Failed to fetch proposals',
-            statusCode: e.response?.statusCode,
-          ),
+          ApiFailure(message: errorMessage, statusCode: e.response?.statusCode),
         );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
@@ -64,11 +67,14 @@ class ProposalsRepository implements IProposalsRepository {
         final entity = model.toEntity();
         return Right(entity);
       } on DioException catch (e) {
+        String errorMessage = 'Failed to fetch proposal';
+        if (e.response?.data is Map<String, dynamic>) {
+          errorMessage = e.response?.data['message'] ?? errorMessage;
+        } else if (e.response?.data is String) {
+          errorMessage = e.response?.data as String;
+        }
         return Left(
-          ApiFailure(
-            message: e.response?.data['message'] ?? 'Failed to fetch proposal',
-            statusCode: e.response?.statusCode,
-          ),
+          ApiFailure(message: errorMessage, statusCode: e.response?.statusCode),
         );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
@@ -102,11 +108,14 @@ class ProposalsRepository implements IProposalsRepository {
         final entity = model.toEntity();
         return Right(entity);
       } on DioException catch (e) {
+        String errorMessage = 'Failed to create proposal';
+        if (e.response?.data is Map<String, dynamic>) {
+          errorMessage = e.response?.data['message'] ?? errorMessage;
+        } else if (e.response?.data is String) {
+          errorMessage = e.response?.data as String;
+        }
         return Left(
-          ApiFailure(
-            message: e.response?.data['message'] ?? 'Failed to create proposal',
-            statusCode: e.response?.statusCode,
-          ),
+          ApiFailure(message: errorMessage, statusCode: e.response?.statusCode),
         );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
@@ -130,13 +139,14 @@ class ProposalsRepository implements IProposalsRepository {
         final entity = model.toEntity();
         return Right(entity);
       } on DioException catch (e) {
+        String errorMessage = 'Failed to update proposal status';
+        if (e.response?.data is Map<String, dynamic>) {
+          errorMessage = e.response?.data['message'] ?? errorMessage;
+        } else if (e.response?.data is String) {
+          errorMessage = e.response?.data as String;
+        }
         return Left(
-          ApiFailure(
-            message:
-                e.response?.data['message'] ??
-                'Failed to update proposal status',
-            statusCode: e.response?.statusCode,
-          ),
+          ApiFailure(message: errorMessage, statusCode: e.response?.statusCode),
         );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
@@ -153,11 +163,14 @@ class ProposalsRepository implements IProposalsRepository {
         await _proposalsRemoteDatasource.deleteProposal(id);
         return const Right(null);
       } on DioException catch (e) {
+        String errorMessage = 'Failed to delete proposal';
+        if (e.response?.data is Map<String, dynamic>) {
+          errorMessage = e.response?.data['message'] ?? errorMessage;
+        } else if (e.response?.data is String) {
+          errorMessage = e.response?.data as String;
+        }
         return Left(
-          ApiFailure(
-            message: e.response?.data['message'] ?? 'Failed to delete proposal',
-            statusCode: e.response?.statusCode,
-          ),
+          ApiFailure(message: errorMessage, statusCode: e.response?.statusCode),
         );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));

@@ -34,11 +34,6 @@ class PostCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                alignment: Alignment.centerRight,
-                width: double.infinity,
-                child: const Icon(Icons.favorite_outline),
-              ),
-              Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
                   border: Border.all(color: Colors.grey[200]!),

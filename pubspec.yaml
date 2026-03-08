@@ -38,8 +38,8 @@ dependencies:
   email_validator: ^2.1.17
   shared_preferences: ^2.5.4
   flutter_secure_storage: ^10.0.0
-
   pretty_dio_logger: ^1.4.0
+
   # State Management
   flutter_riverpod: ^2.5.1
   riverpod_annotation: ^2.3.5
@@ -50,35 +50,37 @@ dependencies:
   path_provider: ^2.1.2
   path: ^1.9.0
 
-  #Utilities
+  # Utilities
   uuid: ^4.3.3
 
   # Permissions
   permission_handler: ^12.0.1
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  # Cupertino Icons
   cupertino_icons: ^1.0.8
-  easy_splash_screen:
-    ^1.0.4
+  easy_splash_screen: ^1.0.4
 
-    # Networking
+  # Networking
   dio: ^5.9.0
   dio_smart_retry: ^7.0.1
   connectivity_plus: ^7.0.0
 
-  #MEdia Handling
+  # Media Handling
   flutter_image_compress: ^2.2.0
   video_compress: ^3.1.4
   image_picker: ^1.0.7
   cached_network_image: ^3.3.1
-  # flutter_cached_manager: ^2.0.1
   video_thumbnail: ^0.5.3
   test_cov_console: ^0.2.2
 
   # JSON Serialization
   json_annotation: ^4.8.1
   intl: ^0.19.0
+
+flutter_launcher_icons:
+  android: "launchericon"
+  image_path: "assets/icons/icon.png"
+  min_sdk_android: 21
 
 dev_dependencies:
   flutter_test:
@@ -109,6 +111,7 @@ flutter:
   assets:
     - assets/images/background.png
     - assets/icons/branding.png
+    - assets/icons/icon.png
     - assets/images/onboard2.svg
     - assets/images/onboard1.svg
     - assets/images/onboard3.svg

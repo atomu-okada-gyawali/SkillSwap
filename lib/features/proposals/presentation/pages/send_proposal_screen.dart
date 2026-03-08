@@ -5,6 +5,7 @@ import 'package:skillswap/features/posts/presentation/view_model/posts_viewmodel
 import 'package:skillswap/features/posts/presentation/state/post_state.dart';
 import 'package:skillswap/features/proposals/presentation/providers/proposals_provider.dart';
 import 'package:skillswap/features/proposals/presentation/widgets/schedule_form.dart';
+import 'package:skillswap/utils/my_colors.dart';
 
 class SendProposalScreen extends ConsumerStatefulWidget {
   final String postId;
@@ -27,6 +28,7 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   int _durationMinutes = 60;
+  bool _hasTriedLoadingPosts = false;
 
   @override
   void initState() {
@@ -35,6 +37,9 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
   }
 
   Future<void> _loadUserPosts() async {
+    setState(() {
+      _hasTriedLoadingPosts = true;
+    });
     await ref.read(postsViewModelProvider.notifier).getMyPosts();
   }
 
@@ -90,14 +95,22 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
                   setState(() => _durationMinutes = duration),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: proposalsState.isLoading ? null : _submitProposal,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+            Container(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: proposalsState.isLoading ? null : _submitProposal,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: MyColors.color5,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: proposalsState.isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Send Proposal'),
               ),
-              child: proposalsState.isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text('Send Proposal'),
             ),
             if (proposalsState.error != null)
               Padding(
@@ -114,11 +127,14 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
   }
 
   Widget _buildPostDropdown(PostState postsState) {
-    if (postsState.status == PostStatus.loading) {
+    final myPosts = postsState.myPosts;
+
+    // Only show loading spinner if we haven't tried loading yet and status is loading
+    if (!_hasTriedLoadingPosts && postsState.status == PostStatus.loading) {
       return const CircularProgressIndicator();
     }
 
-    if (postsState.status == PostStatus.error) {
+    if (myPosts.isEmpty && postsState.status == PostStatus.error) {
       return Column(
         children: [
           Text('Error loading posts: ${postsState.errorMessage}'),
@@ -128,10 +144,20 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
       );
     }
 
-    final posts = postsState.myPosts;
-
-    if (posts.isEmpty) {
-      return const Text('No posts available. Create a post first.');
+    if (myPosts.isEmpty) {
+      if (postsState.status == PostStatus.loading) {
+        return const CircularProgressIndicator();
+      }
+      return Column(
+        children: [
+          const Text('No posts available. Create a post first.'),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: _loadUserPosts,
+            child: const Text('Refresh Posts'),
+          ),
+        ],
+      );
     }
 
     return DropdownButtonFormField<String>(
@@ -140,7 +166,7 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
         border: OutlineInputBorder(),
         hintText: 'Select a post to offer',
       ),
-      items: posts.map((post) {
+      items: myPosts.map((post) {
         return DropdownMenuItem(value: post.id, child: Text(post.title));
       }).toList(),
       onChanged: (value) => setState(() => _selectedOfferedSkill = value),
@@ -151,13 +177,136 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
 
   Future<void> _submitProposal() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedDate == null || _selectedTime == null) {
+
+    // Validate required fields
+    if (_selectedOfferedSkill == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select date and time')),
+        const SnackBar(
+          content: Text('Please select what you offer'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
+    if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a date'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a time'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Enhanced date/time validation
+    final now = DateTime.now();
+    final selectedDateTime = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      _selectedTime!.hour,
+      _selectedTime!.minute,
+    );
+
+    // Check if date is in the past
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+    );
+
+    if (selectedDay.isBefore(today)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Selected date cannot be in the past'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Check if date is more than 1 year in the future
+    final maxDate = today.add(const Duration(days: 365));
+    if (selectedDay.isAfter(maxDate)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Selected date cannot be more than 1 year in the future',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Check if time is at least 1 hour from now
+    final bufferTime = now.add(const Duration(hours: 1));
+    if (selectedDateTime.isBefore(bufferTime)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a time at least 1 hour from now'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Validate duration
+    if (_durationMinutes < 15) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Duration must be at least 15 minutes'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Validate message
+    final message = _messageController.text.trim();
+    if (message.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a message'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (message.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Message must be at least 10 characters long'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (message.length > 500) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Message must be less than 500 characters'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // All validations passed, submit proposal
     final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate!);
     final timeStr =
         '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}';
@@ -168,7 +317,7 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
           receiverId: widget.receiverId,
           postId: widget.postId,
           offeredSkill: _selectedOfferedSkill!,
-          message: _messageController.text,
+          message: message,
           proposedDate: dateStr,
           proposedTime: timeStr,
           durationMinutes: _durationMinutes,
@@ -178,7 +327,10 @@ class _SendProposalScreenState extends ConsumerState<SendProposalScreen> {
     if (state.error == null) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Proposal sent successfully!')),
+        const SnackBar(
+          content: Text('Proposal sent successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
     }
   }

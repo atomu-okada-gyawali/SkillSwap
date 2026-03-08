@@ -9,12 +9,8 @@ part of 'proposal_model.dart';
 ProposalModel _$ProposalModelFromJson(Map<String, dynamic> json) =>
     ProposalModel(
       id: json['_id'] as String?,
-      senderId: json['senderId'] == null
-          ? null
-          : AuthApiModel.fromJson(json['senderId'] as Map<String, dynamic>),
-      receiverId: json['receiverId'] == null
-          ? null
-          : AuthApiModel.fromJson(json['receiverId'] as Map<String, dynamic>),
+      senderId: _senderIdFromJson(json['senderId']),
+      receiverId: _receiverIdFromJson(json['receiverId']),
       postId: _postIdFromJson(json['postId']),
       offeredSkill: _offeredSkillFromJson(json['offeredSkill']),
       message: json['message'] as String,

@@ -7,9 +7,9 @@
 <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
 <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <application
-        android:label="skillswap"
+        android:label="SkillSwap"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launchericon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -50,3 +50,5 @@
         </intent>
     </queries>
 </manifest>
+
+                                                                                                      

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:skillswap/features/profile/presentation/pages/edit_profile_screen.dart';
 import 'package:skillswap/features/posts/presentation/pages/my_posts_screen.dart';
+import 'package:skillswap/features/splash/presentation/pages/splash_screen.dart';
 import 'package:skillswap/utils/my_colors.dart';
 import 'package:skillswap/core/api/api_endpoints.dart';
 import 'package:skillswap/core/services/storage/user_session_service.dart';
@@ -112,38 +113,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       SizedBox(height: 20),
                     ],
                   ),
-                  Positioned(
-                    bottom: -25,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        constraints: BoxConstraints(maxWidth: 300.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("have 3 skills"),
-                            Text("12 skill exchanges"),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -231,6 +200,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     color: Colors.red,
                     onTap: () async {
                       await ref.read(authViewModelProvider.notifier).logout();
+                      if (mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (_) => const SplashScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      }
                     },
                   ),
                 ],

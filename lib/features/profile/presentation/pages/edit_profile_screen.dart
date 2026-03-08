@@ -428,59 +428,6 @@ class _EditProfileContentState extends ConsumerState<_EditProfileContent>
           ),
         ],
       ),
-      child: Column(
-        children: [
-          _buildOptionTile(
-            icon: Icons.email_outlined,
-            title: 'Email',
-            subtitle: widget.user.email,
-            onTap: null, // Read-only
-          ),
-          const Divider(height: 1),
-          _buildOptionTile(
-            icon: Icons.phone_outlined,
-            title: 'Phone',
-            subtitle: widget.user.phoneNumber ?? 'Not added',
-            onTap: null, // Read-only for now
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOptionTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    VoidCallback? onTap,
-  }) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: MyColors.color1.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(icon, color: MyColors.color1, size: 20),
-      ),
-      title: Text(
-        title,
-        style: Theme.of(
-          context,
-        ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: Theme.of(
-          context,
-        ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
-      ),
-      trailing: onTap != null
-          ? const Icon(Icons.chevron_right, color: Colors.grey)
-          : null,
-      onTap: onTap,
     );
   }
 
@@ -504,7 +451,7 @@ class _EditProfileContentState extends ConsumerState<_EditProfileContent>
       child: ElevatedButton(
         onPressed: _isLoading ? null : _saveProfile,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
+          backgroundColor: MyColors.color5,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

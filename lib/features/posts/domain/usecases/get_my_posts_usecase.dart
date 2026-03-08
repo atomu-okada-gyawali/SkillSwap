@@ -19,6 +19,6 @@ class GetMyPostsUseCase implements UsecaseWithoutParams<List<PostEntity>> {
 
   @override
   Future<Either<Failure, List<PostEntity>>> call() {
-    return _postsRepository.getPostByUser('');
+    return _postsRepository.getMyPosts();
   }
 }

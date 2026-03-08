@@ -15,16 +15,23 @@ String? _userIdFromJson(dynamic json) {
   return null;
 }
 
-/// Custom converter to extract user object from nested userId field
-AuthApiModel? _userFromUserIdJson(dynamic json) {
+/// Custom converter to handle tag field (can be String or Map)
+TagModel? _tagFromJson(dynamic json) {
+  if (json == null) return null;
+
+  if (json is String) {
+    return TagModel(id: json, name: json);
+  }
+
   if (json is Map<String, dynamic>) {
-    try {
-      return AuthApiModel.fromJson(json);
-    } catch (e) {
-      print('DEBUG: Failed to parse user from userId object: $e');
-      return null;
+    // Extract name from tag object
+    final tagName = json['name'] as String?;
+    final tagId = json['_id'] as String?;
+    if (tagName != null) {
+      return TagModel(id: tagId, name: tagName);
     }
   }
+
   return null;
 }
 
@@ -39,6 +46,7 @@ class PostModel {
   @JsonKey(name: 'postPhoto')
   final String? postPhoto;
   final List<String> requirements;
+  @JsonKey(fromJson: _tagFromJson)
   final TagModel? tag;
   @JsonKey(name: 'locationType')
   final String locationType;

@@ -27,14 +27,52 @@ String _offeredSkillFromJson(dynamic json) {
   return '';
 }
 
+/// Custom converter to handle senderId - could be string or object
+AuthApiModel? _senderIdFromJson(dynamic json) {
+  if (json == null) return null;
+  if (json is String) {
+    // API returns user ID as string
+    return AuthApiModel(
+      id: json,
+      username: '',
+      fullName: '',
+      profilePicture: '',
+    );
+  }
+  if (json is Map<String, dynamic>) {
+    // API returns populated user object
+    return AuthApiModel.fromJson(json);
+  }
+  return null;
+}
+
+/// Custom converter to handle receiverId - could be string or object
+AuthApiModel? _receiverIdFromJson(dynamic json) {
+  if (json == null) return null;
+  if (json is String) {
+    // API returns user ID as string
+    return AuthApiModel(
+      id: json,
+      username: '',
+      fullName: '',
+      profilePicture: '',
+    );
+  }
+  if (json is Map<String, dynamic>) {
+    // API returns populated user object
+    return AuthApiModel.fromJson(json);
+  }
+  return null;
+}
+
 @JsonSerializable()
 class ProposalModel {
   @JsonKey(name: '_id')
   final String? id;
-  @JsonKey(name: 'senderId')
-  final AuthApiModel? senderId; // API returns populated object
-  @JsonKey(name: 'receiverId')
-  final AuthApiModel? receiverId; // API returns populated object
+  @JsonKey(name: 'senderId', fromJson: _senderIdFromJson)
+  final AuthApiModel? senderId; // API returns populated object or string
+  @JsonKey(name: 'receiverId', fromJson: _receiverIdFromJson)
+  final AuthApiModel? receiverId; // API returns populated object or string
   @JsonKey(name: 'postId', fromJson: _postIdFromJson)
   final String postId; // API returns string or object
   @JsonKey(name: 'offeredSkill', fromJson: _offeredSkillFromJson)

@@ -16,9 +16,7 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
               ?.map((e) => e as String)
               .toList() ??
           const [],
-      tag: json['tag'] == null
-          ? null
-          : TagModel.fromJson(json['tag'] as Map<String, dynamic>),
+      tag: _tagFromJson(json['tag']),
       locationType: json['locationType'] as String? ?? 'remote',
       availability: json['availability'] as String? ?? 'flexible',
       duration: json['duration'] as String?,

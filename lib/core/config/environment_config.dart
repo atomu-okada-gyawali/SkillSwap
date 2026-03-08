@@ -41,7 +41,7 @@ class EnvironmentConfig {
     // return 'http://10.0.2.2:3000/api/v1';
 
     // For physical device, use your computer's local IP:
-    return 'http://192.168.1.68:5050';
+    return 'http://10.106.250.248:5050';
   }
 
   /// Get URL for iOS platform

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skillswap/features/posts/presentation/view_model/posts_viewmodel.dart';
 import 'package:skillswap/features/posts/presentation/widgets/my_post_card.dart';
-import 'package:skillswap/features/posts/presentation/pages/post_detail_screen.dart';
 import 'package:skillswap/features/posts/presentation/state/post_state.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
@@ -139,15 +138,7 @@ class _MyPostsScreenState extends ConsumerState<MyPostsScreen>
               return MyPostCard(
                 post: post,
                 onTap: () {
-                  if (post.id != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            PostDetailScreen(postId: post.id!),
-                      ),
-                    );
-                  }
+                  // Post detail functionality removed
                 },
                 onPostChanged: () {
                   ref.read(postsViewModelProvider.notifier).getMyPosts();
