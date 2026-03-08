@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:skillswap/features/auth/domain/entities/auth_entity.dart';
-import 'package:skillswap/features/auth/presentation/state/auth_state.dart';
-import 'package:skillswap/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:skillswap/features/posts/domain/entities/post_entity.dart';
 import 'package:skillswap/features/proposals/domain/entities/proposal_entity.dart';
+import 'package:skillswap/features/proposals/presentation/view_model/proposals_viewmodel.dart';
 import 'package:skillswap/features/proposals/presentation/widgets/proposal_card.dart';
 
-class TestProposalsViewModel extends ProposalsViewModelForTest {}
-
-class ProposalsViewModelForTest extends ChangeNotifier {
+class MockProposalsViewModel extends AsyncNotifier<List<ProposalEntity>>
+    implements ProposalsViewModel {
   @override
   Future<PostEntity?> getPostById(String postId) async {
     return PostEntity(
@@ -26,6 +24,29 @@ class ProposalsViewModelForTest extends ChangeNotifier {
       username: 'testuser',
     );
   }
+
+  @override
+  Future<List<ProposalEntity>> build() async => [];
+
+  @override
+  Future<void> refresh() async {}
+
+  @override
+  Future<void> acceptProposal(String id) async {}
+
+  @override
+  Future<void> rejectProposal(String id) async {}
+
+  @override
+  Future<void> createProposal({
+    required String receiverId,
+    required String postId,
+    required String offeredSkill,
+    required String message,
+    required String proposedDate,
+    required String proposedTime,
+    required int durationMinutes,
+  }) async {}
 }
 
 void main() {
@@ -57,9 +78,7 @@ void main() {
   Widget createTestWidget({required Widget child}) {
     return ProviderScope(
       overrides: [
-        proposalsViewModelProviderForTestProvider.overrideWithValue(
-          TestProposalsViewModel(),
-        ),
+        proposalsViewModelProvider.overrideWith(() => MockProposalsViewModel()),
       ],
       child: MaterialApp(home: Scaffold(body: child)),
     );
@@ -91,7 +110,7 @@ void main() {
       );
 
       await tester.pump();
-      expect(find.text('pending'), findsOneWidget);
+      expect(find.text('PENDING'), findsOneWidget);
     });
   });
 }
