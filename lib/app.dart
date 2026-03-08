@@ -19,7 +19,9 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   bool isDialogOpen = false;
   StreamSubscription? _accelerometerSub;
-  final double shakeThreshold = 15;
+  final double shakeThreshold =
+      20; // Increased for single heavy shake detection
+  DateTime? lastShakeTime;
 
   final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -32,9 +34,16 @@ class _MyAppState extends ConsumerState<MyApp> {
         event.x * event.x + event.y * event.y + event.z * event.z,
       );
 
-if (acceleration > shakeThreshold && !isDialogOpen) {
-  _handleShake();
-}
+      // Check for single heavy shake
+      if (acceleration > shakeThreshold && !isDialogOpen) {
+        // Prevent multiple rapid shakes
+        final now = DateTime.now();
+        if (lastShakeTime == null ||
+            now.difference(lastShakeTime!).inMilliseconds > 1000) {
+          lastShakeTime = now;
+          _handleShake();
+        }
+      }
     });
   }
 
