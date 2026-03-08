@@ -131,65 +131,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   Expanded(child: SizedBox()),
 
-                  // My Posts Section
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: MyColors.color5.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: MyColors.color5.withOpacity(0.3),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'My Posts',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: MyColors.color1,
-                              ),
-                            ),
-                            TextButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const MyPostsScreen(),
-                                  ),
-                                );
-                              },
-                              icon: Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                                color: MyColors.color1,
-                              ),
-                              label: Text(
-                                'View All',
-                                style: TextStyle(
-                                  color: MyColors.color1,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ],
+                  MyBox(
+                    icon: Icons.edit_document,
+                    text: " My Posts",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MyPostsScreen(),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Manage and edit your skill posts',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 16),

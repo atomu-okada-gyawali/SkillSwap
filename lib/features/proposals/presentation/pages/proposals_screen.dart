@@ -91,11 +91,8 @@ class _ProposalsScreenState extends ConsumerState<ProposalsScreen>
               ? receiverId == currentUserId
               : senderId == currentUserId;
 
-
-
           return matches;
         }).toList();
-
 
         if (filteredProposals.isEmpty) {
           return Center(
@@ -105,11 +102,6 @@ class _ProposalsScreenState extends ConsumerState<ProposalsScreen>
                 Text(
                   isReceived ? 'No received proposals' : 'No sent proposals',
                 ),
-                if (kDebugMode)
-                  Text(
-                    'Debug: Total proposals: ${proposals.length}, User ID: $currentUserId',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
               ],
             ),
           );

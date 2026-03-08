@@ -119,7 +119,7 @@ class MyPostCard extends ConsumerWidget {
                                 Icon(
                                   Icons.check_circle_outline,
                                   size: 16,
-                                  color: MyColors.color1,
+                                  color: MyColors.color5,
                                 ),
                                 const SizedBox(width: 4),
                                 Expanded(
@@ -185,13 +185,13 @@ class MyPostCard extends ConsumerWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton.icon(
+                        child: ElevatedButton.icon(
                           onPressed: () => _editPost(context),
                           icon: const Icon(Icons.edit, size: 16),
                           label: const Text('Edit'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: MyColors.color1,
-                            side: BorderSide(color: MyColors.color1),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: MyColors.color5,
+                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                           ),
                         ),

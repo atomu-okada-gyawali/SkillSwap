@@ -33,16 +33,14 @@ class PostCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                width: double.infinity,
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: 131,
-                  height: 141,
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  width: double.infinity,
+                  alignment: Alignment.center,
                   child: imagePath.isNotEmpty && imagePath.startsWith('http')
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
