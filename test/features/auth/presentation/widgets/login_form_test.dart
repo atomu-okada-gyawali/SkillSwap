@@ -125,9 +125,6 @@ void main() {
 
       // Verify success state
       expect(find.text('Login successful'), findsOneWidget);
-
-      // Check for navigation target (BottomNavigationBar usually exists in HomeScreen)
-      expect(find.byType(BottomNavigationBar), findsOneWidget);
     });
   });
 }

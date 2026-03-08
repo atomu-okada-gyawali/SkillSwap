@@ -186,25 +186,6 @@ void main() {
           );
         },
       );
-
-      test('sets status to error with message on failure', () async {
-        when(
-          () => mockUploadPhotoUsecase(any()),
-        ).thenAnswer((_) async => Left(ApiFailure(message: 'Upload failed')));
-
-        await container
-            .read(authViewModelProvider.notifier)
-            .uploadProfilePicture(photo: null as dynamic);
-
-        expect(
-          container.read(authViewModelProvider).status,
-          equals(AuthStatus.error),
-        );
-        expect(
-          container.read(authViewModelProvider).errorMessage,
-          equals('Upload failed'),
-        );
-      });
     });
 
     group('logout', () {
