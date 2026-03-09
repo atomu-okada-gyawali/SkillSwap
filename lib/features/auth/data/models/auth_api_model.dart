@@ -11,13 +11,13 @@ class AuthApiModel {
   final String? confirmPassword;
 
   AuthApiModel({
-    required this.fullName,
-    required this.email,
+    this.id,
+    this.fullName = 'Unknown',
+    this.email = '',
     this.phoneNumber,
-    required this.username,
+    this.username = 'Unknown',
     this.password,
     this.profilePicture,
-    this.id,
     this.confirmPassword,
   });
 
@@ -38,11 +38,11 @@ class AuthApiModel {
   factory AuthApiModel.fromJson(Map<String, dynamic> json) {
     return AuthApiModel(
       id: json['_id'] as String?,
-      fullName: json['fullName'] as String,
-      email: json['email'] as String,
+      fullName: json['fullName'] as String? ?? 'Unknown',
+      email: json['email'] as String? ?? '',
       phoneNumber: json['phoneNumber'] as String?,
-      username: json['username'] as String,
-      password: json['password'] as String,
+      username: json['username'] as String? ?? 'Unknown',
+      password: json['password'] as String?,
       profilePicture: json['profilePicture'] as String?,
     );
   }
@@ -60,7 +60,6 @@ class AuthApiModel {
     );
   }
 
-  // fromEntity
   factory AuthApiModel.fromEntity(AuthEntity entity) {
     return AuthApiModel(
       fullName: entity.fullName,

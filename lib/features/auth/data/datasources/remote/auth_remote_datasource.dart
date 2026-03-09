@@ -51,7 +51,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         fullName: user.fullName,
         username: user.username,
         phoneNumber: user.phoneNumber,
-        profilePicture: user.profilePicture, 
+        profilePicture: user.profilePicture,
       );
 
       // save token
@@ -81,7 +81,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   Future<String> uploadProfilePicture(File image) async {
     final fileName = image.path.split('/').last;
     final formData = FormData.fromMap({
-      'profilePicture': await MultipartFile.fromFileSync(
+      'profilePicture': MultipartFile.fromFileSync(
         image.path,
         filename: fileName,
       ),
@@ -102,5 +102,61 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     }
 
     throw Exception(response.data['message'] ?? 'Upload failed');
+  }
+
+  @override
+  Future<AuthApiModel> updateProfile(
+    String fullName,
+    String? profilePicture,
+    File? newProfileImage,
+  ) async {
+    final token = await _tokenService.getToken();
+
+    if (newProfileImage != null) {
+      // If there's a new image, use FormData to upload both image and data
+      final fileName = newProfileImage.path.split('/').last;
+      final formData = FormData.fromMap({
+        'fullName': fullName,
+        if (profilePicture != null) 'profilePicture': profilePicture,
+        'profilePictureFile': MultipartFile.fromFileSync(
+          newProfileImage.path,
+          filename: fileName,
+        ),
+      });
+
+      final response = await _apiClient.put(
+        ApiEndpoints.userUpdateProfile,
+        data: formData,
+        options: token != null
+            ? Options(headers: {'Authorization': 'Bearer $token'})
+            : null,
+      );
+
+      if (response.data['success'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>;
+        return AuthApiModel.fromJson(data);
+      }
+
+      throw Exception(response.data['message'] ?? 'Update failed');
+    } else {
+      // If no new image, use regular JSON data
+      final response = await _apiClient.put(
+        ApiEndpoints.userUpdateProfile,
+        data: {
+          'fullName': fullName,
+          if (profilePicture != null) 'profilePicture': profilePicture,
+        },
+        options: token != null
+            ? Options(headers: {'Authorization': 'Bearer $token'})
+            : null,
+      );
+
+      if (response.data['success'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>;
+        return AuthApiModel.fromJson(data);
+      }
+
+      throw Exception(response.data['message'] ?? 'Update failed');
+    }
   }
 }

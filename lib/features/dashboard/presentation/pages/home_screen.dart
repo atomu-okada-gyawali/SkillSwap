@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/features/dashboard/presentation/pages/bottom_screen/explore_screen.dart';
+import 'package:skillswap/features/posts/presentation/pages/explore_screen.dart';
 import 'package:skillswap/features/dashboard/presentation/pages/bottom_screen/message_screen.dart';
-import 'package:skillswap/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
-import 'package:skillswap/features/dashboard/presentation/pages/bottom_screen/proposal_screen.dart';
+import 'package:skillswap/features/profile/presentation/pages/profile_screen.dart';
+import 'package:skillswap/features/proposals/presentation/pages/proposal_screen.dart';
+import 'package:skillswap/features/posts/presentation/pages/create_post_screen.dart';
+import 'package:skillswap/features/proposals/presentation/pages/proposals_screen.dart';
 import 'package:skillswap/utils/my_colors.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,8 +17,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   List<Widget> lstBottomScreen = [
-    ExploreScreen(),
-    const ProposalScreen(),
+    const ExploreScreen(),
+    const ProposalsScreen(),
     const MessageScreen(),
     const ProfileScreen(),
   ];
@@ -28,7 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: MyColors.color5,
         foregroundColor: MyColors.color1,
         shape: CircleBorder(),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CreatePostScreen()),
+          );
+        },
         child: Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

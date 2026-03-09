@@ -7,15 +7,12 @@ class HiveTableConstant {
   static const int authTypeId = 0;
   static const String authTable = 'auth_table';
 
-  // static const int studentTypeId = 1;
-  // static const String studentTable = 'student_table';
+  static const int proposalTypeId = 1;
+  static const String proposalTable = 'proposal_table';
 
-  // static const int itemTypeId = 2;
-  // static const String itemTable = "item_table";
+  static const int scheduleTypeId = 2;
+  static const String scheduleTable = 'schedule_table';
 
-  // static const int categoryTypeId = 3;
-  // static const String categoryTable = 'category_table';
-
-  // static const int commentsTypeId = 4;
-  // static const String commentsTable = 'comments_table';
+  static const int postTypeId = 3;
+  static const String postTable = 'post_table';
 }

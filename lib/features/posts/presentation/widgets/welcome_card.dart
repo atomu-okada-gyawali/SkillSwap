@@ -24,7 +24,7 @@ class _WelcomeCardConsumerState extends ConsumerState<WelcomeCard> {
     final ImageProvider<Object> profileImage =
         (serverImageName != null && serverImageName.isNotEmpty)
         ? NetworkImage(
-            '${ApiEndpoints.baseUrl}auth/profile-image/$serverImageName',
+            '${ApiEndpoints.baseUrl}$serverImageName',
           )
         : const AssetImage('assets/images/default-profile.jpg');
 
